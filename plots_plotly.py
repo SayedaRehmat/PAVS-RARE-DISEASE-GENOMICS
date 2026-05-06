@@ -173,3 +173,79 @@ def plot_adat3(df):
     )
 
     return fig
+# =========================
+# MODULE 2: POPULATION
+# =========================
+def plot_population(stats_df):
+
+    if stats_df.empty:
+        return px.bar(title="No population data")
+
+    df = stats_df.reset_index().rename(columns={"index": "source"})
+
+    fig = px.bar(
+        df,
+        x="source",
+        y="n",
+        color="solved_pct",
+        title="Population Cohort Size & Solved Rate"
+    )
+
+    return fig
+
+
+# =========================
+# MODULE 4: AR ARCHITECTURE
+# =========================
+def plot_ar_architecture(df):
+
+    vc = safe_counts(df["zygosity_label"], col_name="zygosity")
+
+    fig = px.pie(
+        vc,
+        names="zygosity",
+        values="count",
+        title="Autosomal Recessive Architecture"
+    )
+
+    return fig
+
+
+# =========================
+# MODULE 8: GENE MODEL
+# =========================
+def plot_gene_model(results):
+
+    df = pd.DataFrame({
+        "metric": ["CV Accuracy", "Top-3", "Top-5"],
+        "value": [results["cv"], results["top3"], results["top5"]]
+    })
+
+    fig = px.bar(
+        df,
+        x="metric",
+        y="value",
+        title="Gene Model Performance"
+    )
+
+    return fig
+
+
+# =========================
+# MODULE 9: PATHOGENICITY
+# =========================
+def plot_pathogenicity_curve(precision, recall):
+
+    df = pd.DataFrame({
+        "precision": precision,
+        "recall": recall
+    })
+
+    fig = px.line(
+        df,
+        x="recall",
+        y="precision",
+        title="Precision-Recall Curve"
+    )
+
+    return fig
