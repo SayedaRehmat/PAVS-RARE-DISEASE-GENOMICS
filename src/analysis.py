@@ -25,7 +25,15 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
 OUT_DIR = "outputs"
-os.makedirs(OUT_DIR, exist_ok=True)
+import shutil
+
+if os.path.exists(OUT_DIR):
+    if os.path.isdir(OUT_DIR):
+        shutil.rmtree(OUT_DIR)
+    else:
+        os.remove(OUT_DIR)
+
+os.makedirs(OUT_DIR)
 
 TREATABLE_GENES = {
     "SLC19A3": "Biotin+Thiamine (BTBGD) — URGENT",
@@ -939,3 +947,7 @@ def run_pipeline_for_ui(data_path):
             "outputs/fig00_FINAL_DASHBOARD.png"
         ]
     }
+def run_pipeline_for_ui():
+    results, df = run_all("data/PAVS_cases.tsv")
+
+    return results
