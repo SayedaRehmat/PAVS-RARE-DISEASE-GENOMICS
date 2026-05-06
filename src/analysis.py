@@ -945,3 +945,40 @@ def run_pipeline_for_ui():
     results, df = run_all("data/PAVS_cases.tsv")
 
     return results
+def build_system():
+    df, _ = load_data("data/PAVS_cases.tsv")
+
+    # Basic stats
+    total_cases = len(df)
+    solved = df["solved_status"].eq("SOLVED").sum()
+    hom_pct = (df["zygosity_label"]=="homozygous").mean()
+
+    # Founder mutations
+    founders = (
+        df.groupby(["gene_symbol","hgvs_c"])
+        .size().reset_index(name="n")
+        .sort_values("n", ascending=False)
+    )
+
+    # Treatable
+    treatable = df[df["gene_symbol"].isin(TREATABLE_GENES)]
+    treatable_unsolved = treatable[treatable["solved_status"]=="IN_PROGRESS"]
+
+    # Simple VUS scoring
+    vus = df[df["acmg_classification"]=="UNCERTAIN_SIGNIFICANCE"].copy()
+    vus["score"] = (
+        vus["gnomad_pli"].fillna(0)*2 +
+        vus["hpo_count"]*0.5 +
+        (vus["vep_impact"]=="HIGH").astype(int)*3
+    )
+    vus = vus.sort_values("score", ascending=False)
+
+    return {
+        "df": df,
+        "total_cases": total_cases,
+        "solved": solved,
+        "hom_pct": hom_pct,
+        "founders": founders,
+        "treatable_unsolved": treatable_unsolved,
+        "vus": vus
+    }
