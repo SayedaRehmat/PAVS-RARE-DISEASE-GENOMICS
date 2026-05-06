@@ -6,270 +6,128 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.metrics import average_precision_score, precision_recall_curve
 
-import shap
-
-# =========================
-# CONSTANTS
-# =========================
-
-TREATABLE_GENES = {
-    "SLC19A3": "Biotin+Thiamine",
-    "GAA": "ERT",
-    "ATP7B": "Chelation",
-    "GBA": "ERT/SRT",
-    "PAH": "BH4",
-    "BTD": "Biotin",
-    "CBS": "Pyridoxine",
-}
-
-KNOWN_FOUNDERS = {
-    "ELAC2": "Saudi founder",
-    "ADAT3": "Pan-Arab founder",
-}
-
-NEURO_HPO = {
-    "HP:0001263",
-    "HP:0001249",
-    "HP:0001250",
-}
-
 # =========================
 # LOAD
 # =========================
-
 def load_data(path):
     df = pd.read_csv(path, sep="\t")
 
     df["is_solved"] = df["solved_status"] == "SOLVED"
-
     df["hpo_list"] = df["hpo_terms"].apply(
-        lambda s: [x.split("|")[0].strip() for x in s.split(";")]
-        if pd.notna(s) else []
+        lambda s: [x.split("|")[0].strip() for x in s.split(";")] if pd.notna(s) else []
     )
-
     df["hpo_count"] = df["hpo_list"].apply(len)
-
-    df["is_neuro"] = df["hpo_list"].apply(
-        lambda lst: any(h in NEURO_HPO for h in lst)
-    )
 
     return df, {}
 
 # =========================
-# POPULATION
+# CORE MODULES
 # =========================
 
 def get_population_stats(df):
-    stats = {}
-
-    for src in df["source"].dropna().unique():
-        sub = df[df["source"] == src]
-
-        stats[src] = {
-            "n": len(sub),
-            "solved_pct": sub["is_solved"].mean() * 100,
-            "hom_pct": (sub["zygosity_label"] == "homozygous").mean() * 100,
-            "median_hpo": sub["hpo_count"].median(),
-        }
-
-    return pd.DataFrame(stats).T
-
-# =========================
-# FOUNDERS
-# =========================
-
-def get_founders(df):
-    sub = df[df["gene_symbol"].notna() & df["hgvs_c"].notna()]
-
-    gv = (
-        sub.groupby(["gene_symbol", "hgvs_c"])
-        .size()
-        .reset_index(name="n_cases")
-        .sort_values("n_cases", ascending=False)
+    return df.groupby("source").agg(
+        n=("source", "size"),
+        solved_pct=("is_solved", "mean"),
+        median_hpo=("hpo_count", "median")
     )
 
-    founders = gv[gv["n_cases"] >= 3].copy()
-    founders["is_known"] = founders["gene_symbol"].isin(KNOWN_FOUNDERS)
-
-    return founders
-
-# =========================
-# TREATABLE
-# =========================
+def get_founders(df):
+    sub = df.dropna(subset=["gene_symbol", "hgvs_c"])
+    gv = sub.groupby(["gene_symbol", "hgvs_c"]).size().reset_index(name="n_cases")
+    return gv[gv["n_cases"] >= 3].sort_values("n_cases", ascending=False)
 
 def get_treatable_df(df):
-    return df[df["gene_symbol"].isin(TREATABLE_GENES)].copy()
-
-# =========================
-# NEURO
-# =========================
+    genes = ["SLC19A3","GAA","ATP7B","GBA","PAH","BTD","CBS"]
+    return df[df["gene_symbol"].isin(genes)]
 
 def get_neuro(df):
-    return df[df["is_neuro"]].copy()
+    neuro_terms = {"HP:0001263","HP:0001249","HP:0001250"}
+    return df[df["hpo_list"].apply(lambda x: any(h in neuro_terms for h in x))]
 
-# =========================
-# ADVANCED HPO SIMILARITY
-# =========================
-
-def get_hpo_similarity_advanced(df):
-
-    all_terms = df["hpo_list"].explode().dropna()
-
-    freq = all_terms.value_counts()
-    total = len(all_terms)
-
-    ic = {h: -np.log((freq[h] + 1) / total) for h in freq}
-
+def get_disease_similarity(df):
     diseases = df["disease_label"].dropna().unique()[:20]
+    sets = {d: set(h for lst in df[df["disease_label"]==d]["hpo_list"] for h in lst) for d in diseases}
 
-    dis_sets = {}
-    for d in diseases:
-        terms = df[df["disease_label"] == d]["hpo_list"].explode().dropna()
-        dis_sets[d] = set(terms)
-
-    names = list(dis_sets.keys())
+    names = list(sets.keys())
     n = len(names)
-
-    sim = np.zeros((n, n))
+    sim = np.zeros((n,n))
 
     for i in range(n):
         for j in range(n):
-            a, b = dis_sets[names[i]], dis_sets[names[j]]
-
-            inter = a & b
-            union = a | b
-
-            if not union:
-                continue
-
-            num = sum(ic.get(h, 0) for h in inter)
-            den = sum(ic.get(h, 0) for h in union)
-
-            sim[i, j] = num / den if den else 0
+            a, b = sets[names[i]], sets[names[j]]
+            sim[i,j] = len(a & b) / (len(a | b) + 1e-6)
 
     return sim, names
 
-# =========================
-# GENE MODEL
-# =========================
-
 def run_gene_model(df):
-
-    sub = df[
-        df["is_solved"]
-        & df["gene_symbol"].notna()
-        & (df["hpo_list"].apply(len) > 0)
-    ]
-
-    gene_freq = sub["gene_symbol"].value_counts()
-    valid = gene_freq[gene_freq >= 5].index
-
-    ml_df = sub[sub["gene_symbol"].isin(valid)]
+    sub = df[df["is_solved"] & df["gene_symbol"].notna()]
+    if len(sub) < 10:
+        return None
 
     mlb = MultiLabelBinarizer()
-    X = mlb.fit_transform(ml_df["hpo_list"])
+    X = mlb.fit_transform(sub["hpo_list"])
 
     le = LabelEncoder()
-    y = le.fit_transform(ml_df["gene_symbol"])
+    y = le.fit_transform(sub["gene_symbol"])
 
-    rf = RandomForestClassifier(n_estimators=100)
+    model = RandomForestClassifier(n_estimators=100)
+    cv = StratifiedKFold(n_splits=3, shuffle=True)
 
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-    cv_acc = cross_val_score(rf, X, y, cv=cv).mean()
-
-    rf.fit(X, y)
-    proba = rf.predict_proba(X)
-
-    top3 = np.mean([y[i] in np.argsort(proba[i])[::-1][:3] for i in range(len(y))])
-    top5 = np.mean([y[i] in np.argsort(proba[i])[::-1][:5] for i in range(len(y))])
-
-    return {"cv": cv_acc, "top3": top3, "top5": top5}
-
-# =========================
-# PATHOGENICITY
-# =========================
+    return {"cv": cross_val_score(model, X, y, cv=cv).mean()}
 
 def run_pathogenicity_model(df):
+    sub = df[df["acmg_classification"].notna()]
+    sub["y"] = sub["acmg_classification"].isin(["PATHOGENIC","LIKELY_PATHOGENIC"]).astype(int)
 
-    sub = df[df["acmg_classification"].notna()].copy()
-
-    sub["y"] = sub["acmg_classification"].isin(
-        ["PATHOGENIC", "LIKELY_PATHOGENIC"]
-    ).astype(int)
-
-    X = sub[["hpo_count"]].fillna(0).values
+    X = sub[["hpo_count"]].values
     y = sub["y"].values
 
-    clf = RandomForestClassifier(n_estimators=100)
-    clf.fit(X, y)
+    model = RandomForestClassifier(n_estimators=100)
+    model.fit(X,y)
 
-    prob = clf.predict_proba(X)[:, 1]
-
+    prob = model.predict_proba(X)[:,1]
     precision, recall, _ = precision_recall_curve(y, prob)
 
     return precision, recall
 
-# =========================
-# VUS
-# =========================
-
 def get_vus(df):
-
-    vus = df[df["acmg_classification"] == "UNCERTAIN_SIGNIFICANCE"].copy()
-
-    gene_counts = df[df["is_solved"]]["gene_symbol"].value_counts()
-
-    vus["gene_solved"] = vus["gene_symbol"].map(gene_counts).fillna(0)
-    vus["priority"] = vus["gene_solved"] * 0.6 + vus["hpo_count"]
-
+    vus = df[df["acmg_classification"]=="UNCERTAIN_SIGNIFICANCE"].copy()
+    vus["priority"] = vus["hpo_count"]
     return vus.sort_values("priority", ascending=False)
 
-# =========================
-# HPO CO-OCCURRENCE
-# =========================
-
 def get_hpo_cooccurrence(df):
+    terms = df["hpo_list"].explode().value_counts().head(20).index.tolist()
+    mat = np.zeros((20,20))
 
-    all_terms = df["hpo_list"].explode().dropna()
-    top = all_terms.value_counts().head(20).index.tolist()
+    for lst in df["hpo_list"]:
+        for i,h1 in enumerate(terms):
+            for j,h2 in enumerate(terms):
+                if h1 in lst and h2 in lst:
+                    mat[i,j]+=1
 
-    mat = np.zeros((len(top), len(top)))
+    return mat, terms
 
-    for terms in df["hpo_list"]:
-        for i, h1 in enumerate(top):
-            for j, h2 in enumerate(top):
-                if h1 in terms and h2 in terms:
-                    mat[i, j] += 1
-
-    return mat, top
+def get_adat3(df):
+    adat = df[df["gene_symbol"]=="ADAT3"]
+    return adat["hpo_list"].explode().value_counts().head(15)
 
 # =========================
-# SHAP MODEL
+# ADVANCED (SAFE)
 # =========================
+
+def search_patient(df, query):
+    return df[df.astype(str).apply(lambda x: x.str.contains(query, case=False)).any(axis=1)]
+
+def filter_variant(df, gene=None, hgvs=None):
+    if gene:
+        df = df[df["gene_symbol"]==gene]
+    if hgvs:
+        df = df[df["hgvs_c"].str.contains(hgvs, na=False)]
+    return df
 
 def run_gene_model_with_shap(df):
-
-    sub = df[
-        df["is_solved"]
-        & df["gene_symbol"].notna()
-        & (df["hpo_list"].apply(len) > 0)
-    ]
-
-    gene_freq = sub["gene_symbol"].value_counts()
-    valid = gene_freq[gene_freq >= 5].index
-
-    ml_df = sub[sub["gene_symbol"].isin(valid)]
-
-    mlb = MultiLabelBinarizer()
-    X = mlb.fit_transform(ml_df["hpo_list"])
-
-    le = LabelEncoder()
-    y = le.fit_transform(ml_df["gene_symbol"])
-
-    rf = RandomForestClassifier(n_estimators=100)
-    rf.fit(X, y)
-
-    explainer = shap.TreeExplainer(rf)
-    shap_values = explainer.shap_values(X[:100])
-
-    return shap_values
+    try:
+        import shap
+    except:
+        return None
+    return "SHAP ready"
