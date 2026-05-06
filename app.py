@@ -7,7 +7,7 @@ import os
 # SAFE PATH HANDLING
 # ─────────────────────────────
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
-from src.analysis import run_for_dashboard
+from analysis import run_for_dashboard
 
 # ─────────────────────────────
 # CONFIG
