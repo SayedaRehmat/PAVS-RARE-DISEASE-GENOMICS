@@ -915,3 +915,27 @@ def run_all(data_path="data/PAVS_cases.tsv"):
 
 if __name__ == "__main__":
     run_all()
+def run_pipeline_for_ui(data_path):
+    results, df = run_all(data_path)
+
+    return {
+        "summary": results,
+        "figures": [
+            "outputs/fig01_cohort_overview.png",
+            "outputs/fig02_genes_diseases.png",
+            "outputs/fig03_variant_landscape.png",
+            "outputs/fig04_top_hpo_terms.png",
+            "outputs/fig05_population_comparison.png",
+            "outputs/fig06_founder_mutations.png",
+            "outputs/fig07_AR_architecture.png",
+            "outputs/fig08_treatable_diseases.png",
+            "outputs/fig09_neuro_burden.png",
+            "outputs/fig10_disease_similarity.png",
+            "outputs/fig11_gene_model.png",
+            "outputs/fig12_tsne.png",
+            "outputs/fig13_pathogenicity_PR.png",
+            "outputs/fig14_hpo_cooccurrence.png",
+            "outputs/fig15_ADAT3_deepdive.png",
+            "outputs/fig00_FINAL_DASHBOARD.png"
+        ]
+    }
