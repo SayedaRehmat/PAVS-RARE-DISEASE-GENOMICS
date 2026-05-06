@@ -949,7 +949,38 @@ def run_for_dashboard(data_path="data/PAVS_cases.tsv"):
         "n_genes": n_genes
     }
 # ... all your modules above ...
+# ─────────────────────────────────────────────────────────────────────────────
+def run_for_dashboard(data_path="data/PAVS_cases.tsv"):
+    """
+    Lightweight wrapper for UI dashboard.
+    Runs core modules and returns structured outputs (no heavy plotting spam).
+    """
 
+    df, hpo_labels = load_data(data_path)
+
+    # Core modules (safe + fast enough for UI)
+    stats, saudi, ddd = run_population_analysis(df)
+    founders = run_founder_analysis(df, saudi)
+    unsolved_treat_n = run_treatable_analysis(df)
+    neuro_n = run_neuro_analysis(df, hpo_labels)
+    cv_acc, top1, top3, top5, n_genes = run_gene_model(df, saudi)
+    auc, ap = run_pathogenicity_model(df)
+    vus_n = run_vus_analysis(df)
+
+    return {
+        "df": df,
+        "stats": stats,
+        "founders": founders,
+        "unsolved_treat_n": unsolved_treat_n,
+        "neuro_n": neuro_n,
+        "cv_acc": cv_acc,
+        "top3": top3,
+        "top5": top5,
+        "auc": auc,
+        "ap": ap,
+        "vus_n": vus_n,
+        "n_genes": n_genes
+    }
 def run_all(...):
     ...
 
