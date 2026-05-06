@@ -1,153 +1,117 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
 from analysis_core import *
-from plots_plotly import *
 
 st.set_page_config(layout="wide")
 st.title("🧬 PAVS Clinical Genomics Dashboard")
 
-# =========================
-# LOAD
-# =========================
 @st.cache_data
 def load():
     return load_data("data/PAVS_cases.tsv")
 
-df, _ = load()
+df,_ = load()
 
 # =========================
-# FILTERS
+# SIDEBAR
 # =========================
-st.sidebar.header("Filters")
-
-sources = st.sidebar.multiselect(
-    "Source",
-    df["source"].dropna().unique(),
-    default=df["source"].dropna().unique()
-)
-
-genes = st.sidebar.multiselect(
-    "Gene",
-    sorted(df["gene_symbol"].dropna().unique())
-)
-
-hgvs_query = st.sidebar.text_input("HGVS Variant")
-
-filtered_df = df[df["source"].isin(sources)]
-
-if genes:
-    filtered_df = filtered_df[filtered_df["gene_symbol"].isin(genes)]
-
-if hgvs_query:
-    filtered_df = filtered_df[
-        filtered_df["hgvs_c"].astype(str).str.contains(hgvs_query, na=False)
-    ]
-
-# =========================
-# PATIENT SEARCH
-# =========================
-st.sidebar.subheader("Patient Lookup")
-
-pid = st.sidebar.text_input("Patient ID")
-
-if pid:
-    res = filtered_df[filtered_df["patient_id"].astype(str) == pid]
-    st.write(res)
-
-# =========================
-# NAV
-# =========================
-tab = st.sidebar.radio("Module", [
-    "EDA", "Population", "Founders", "Treatable",
-    "Neuro", "Similarity", "Gene Model",
-    "Pathogenicity", "VUS", "HPO", "SHAP"
+tab = st.sidebar.radio("Navigation", [
+    "Overview","Population","Founders","Treatable",
+    "Neuro","Similarity","Gene Model","Pathogenicity",
+    "VUS","HPO","ADAT3","Search","Variant Filter"
 ])
 
 # =========================
-# EDA
+# OVERVIEW
 # =========================
-if tab == "EDA":
-    figs = plot_cohort_overview(filtered_df)
-    for f in figs:
-        st.plotly_chart(f, use_container_width=True)
+if tab=="Overview":
+    st.plotly_chart(px.histogram(df,x="hpo_count"))
 
 # =========================
-# POP
+# POPULATION
 # =========================
-elif tab == "Population":
-    stats = get_population_stats(filtered_df)
-    st.plotly_chart(plot_population(stats), use_container_width=True)
+elif tab=="Population":
+    stats = get_population_stats(df)
+    st.dataframe(stats)
 
 # =========================
 # FOUNDERS
 # =========================
-elif tab == "Founders":
-    founders = get_founders(filtered_df)
-    st.plotly_chart(plot_founders(founders), use_container_width=True)
+elif tab=="Founders":
+    f = get_founders(df)
+    st.dataframe(f)
 
 # =========================
 # TREATABLE
 # =========================
-elif tab == "Treatable":
-    treat = get_treatable_df(filtered_df)
-    st.plotly_chart(plot_treatable(treat), use_container_width=True)
+elif tab=="Treatable":
+    t = get_treatable_df(df)
+    st.plotly_chart(px.bar(t["gene_symbol"].value_counts().reset_index(),
+                           x="index",y="gene_symbol"))
 
 # =========================
 # NEURO
 # =========================
-elif tab == "Neuro":
-    neuro = get_neuro(filtered_df)
-    st.plotly_chart(plot_neuro(neuro), use_container_width=True)
+elif tab=="Neuro":
+    n = get_neuro(df)
+    st.plotly_chart(px.bar(n["gene_symbol"].value_counts().reset_index(),
+                           x="index",y="gene_symbol"))
 
 # =========================
 # SIMILARITY
 # =========================
-elif tab == "Similarity":
-    sim, names = get_hpo_similarity_advanced(filtered_df)
-    st.plotly_chart(plot_disease_similarity(sim, names), use_container_width=True)
+elif tab=="Similarity":
+    sim,names = get_disease_similarity(df)
+    st.plotly_chart(px.imshow(sim,x=names,y=names))
 
 # =========================
 # GENE MODEL
 # =========================
-elif tab == "Gene Model":
-    if st.button("Run Model"):
-        res = run_gene_model(filtered_df)
-        st.plotly_chart(plot_gene_model(res), use_container_width=True)
-        st.json(res)
+elif tab=="Gene Model":
+    if st.button("Run"):
+        res = run_gene_model(df)
+        st.write(res)
 
 # =========================
 # PATHOGENICITY
 # =========================
-elif tab == "Pathogenicity":
+elif tab=="Pathogenicity":
     if st.button("Run"):
-        p, r = run_pathogenicity_model(filtered_df)
-        st.plotly_chart(plot_pathogenicity_curve(p, r), use_container_width=True)
+        p,r = run_pathogenicity_model(df)
+        st.plotly_chart(px.line(x=r,y=p))
 
 # =========================
 # VUS
 # =========================
-elif tab == "VUS":
-    vus = get_vus(filtered_df)
-    st.dataframe(vus.head(100))
+elif tab=="VUS":
+    st.dataframe(get_vus(df).head(100))
 
 # =========================
 # HPO
 # =========================
-elif tab == "HPO":
-    mat, terms = get_hpo_cooccurrence(filtered_df)
-    st.plotly_chart(plot_hpo_cooccurrence(mat, terms), use_container_width=True)
+elif tab=="HPO":
+    mat,terms = get_hpo_cooccurrence(df)
+    st.plotly_chart(px.imshow(mat,x=terms,y=terms))
 
 # =========================
-# SHAP
+# ADAT3
 # =========================
-elif tab == "SHAP":
-    if st.button("Run SHAP"):
-        shap_values = run_gene_model_with_shap(filtered_df)
+elif tab=="ADAT3":
+    st.plotly_chart(px.bar(get_adat3(df)))
 
-        import shap
-        import matplotlib.pyplot as plt
+# =========================
+# SEARCH
+# =========================
+elif tab=="Search":
+    q = st.text_input("Search")
+    if q:
+        st.dataframe(search_patient(df,q))
 
-        fig, ax = plt.subplots()
-        shap.summary_plot(shap_values, show=False)
-        st.pyplot(fig)
+# =========================
+# VARIANT FILTER
+# =========================
+elif tab=="Variant Filter":
+    gene = st.text_input("Gene")
+    hgvs = st.text_input("HGVS")
+    st.dataframe(filter_variant(df,gene,hgvs))
