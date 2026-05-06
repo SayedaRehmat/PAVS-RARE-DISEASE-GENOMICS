@@ -117,7 +117,7 @@ elif tabs == "🧬 AR Architecture":
 elif tabs == "💊 Treatable Diseases":
     st.header("Treatable Rare Diseases")
 
-    treat_df = get_treatable(df)
+    treat_df = get_treatable_df(df)
     fig = plot_treatable(treat_df)
 
     st.plotly_chart(fig, use_container_width=True)
@@ -223,7 +223,7 @@ elif tabs == "📊 Final Clinical Dashboard":
     founders = get_founders(df[df["source"] == "PAVS-Saudi"])
     neuro_df = get_neuro(df)
     vus = get_vus(df)
-    treat_df = get_treatable(df)
+    treat_df = get_treatable_df(df)
 
     col1, col2, col3 = st.columns(3)
 
