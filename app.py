@@ -1,189 +1,246 @@
+# app.py
+
 import streamlit as st
 import pandas as pd
-import sys
-import os
 
-# ─────────────────────────────
-# PATH FIX
-# ─────────────────────────────
-sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
-from analysis import run_for_dashboard
+from analysis_core import *
+from plots_plotly import *
 
-# ─────────────────────────────
+# =========================
 # CONFIG
-# ─────────────────────────────
-st.set_page_config(layout="wide")
+# =========================
+st.set_page_config(
+    page_title="PAVS Clinical Genomics Dashboard",
+    layout="wide"
+)
 
-st.title("Population-Aware Variant Reclassification System")
-st.caption("Genomics • ML • Causal Discovery Pipeline")
+st.title("🧬 PAVS Rare Disease Genomics — Clinical Dashboard")
 
-
-# ─────────────────────────────
-# RUN PIPELINE (CACHED)
-# ─────────────────────────────
-@st.cache_data(show_spinner=True)
+# =========================
+# LOAD DATA
+# =========================
+@st.cache_data
 def load():
-    return run_for_dashboard()
+    df, hpo_labels = load_data("data/PAVS_cases.tsv")
+    return df, hpo_labels
 
-data = load()
-df = data["df"]
+df, hpo_labels = load()
 
-
-# ─────────────────────────────
-# SAFE IMAGE LOADER
-# ─────────────────────────────
-def show_image(path, caption=""):
-    if path and os.path.exists(path):
-        st.image(path, caption=caption, use_container_width=True)
-    else:
-        st.warning(f"Missing figure: {path}")
-
-
-# ─────────────────────────────
-# SIDEBAR NAV
-# ─────────────────────────────
+# =========================
+# SIDEBAR
+# =========================
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", [
-    "Overview",
-    "Population Genomics",
-    "Founder Mutations",
-    "Treatable Diseases",
-    "Neuro Burden",
-    "ML Gene Model",
-    "Pathogenicity Model",
-    "VUS Reclassification",
-    "All Figures"
-])
 
+tabs = st.sidebar.radio(
+    "Go to Module:",
+    [
+        "📊 Overview (EDA)",
+        "🌍 Population Genomics",
+        "🧬 Founder Mutations",
+        "🧬 AR Architecture",
+        "💊 Treatable Diseases",
+        "🧠 Neuro Burden",
+        "🔬 Disease Similarity",
+        "🤖 Gene Model",
+        "🧪 Pathogenicity Model",
+        "⚠️ VUS Analysis",
+        "🔗 HPO Co-occurrence",
+        "🧬 ADAT3 Deep Dive",
+        "📊 Final Clinical Dashboard"
+    ]
+)
 
-# ─────────────────────────────
-# OVERVIEW
-# ─────────────────────────────
-if page == "Overview":
+# =========================
+# MODULE 1 — EDA
+# =========================
+if tabs == "📊 Overview (EDA)":
     st.header("Cohort Overview")
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Total Cases", len(df))
-    col2.metric("Solved Cases", int(df["is_solved"].sum()))
-    col3.metric("Unique Genes", df["gene_symbol"].nunique())
-
-    st.dataframe(df.head())
-
-
-# ─────────────────────────────
-# POPULATION
-# ─────────────────────────────
-elif page == "Population Genomics":
-    st.header("Population Stratification")
-
-    st.dataframe(pd.DataFrame(data["stats"]).T)
-
-    show_image(
-        os.path.join("outputs", "fig05_population_comparison.png"),
-        "Population comparison"
-    )
-
-
-# ─────────────────────────────
-# FOUNDER
-# ─────────────────────────────
-elif page == "Founder Mutations":
-    st.header("Founder Mutation Discovery")
-
-    st.dataframe(data["founders"].head(30))
-
-    show_image(
-        os.path.join("outputs", "fig06_founder_mutations.png"),
-        "Founder mutations"
-    )
-
-
-# ─────────────────────────────
-# TREATABLE
-# ─────────────────────────────
-elif page == "Treatable Diseases":
-    st.header("Treatable Disease Mining")
-
-    st.metric("Unsolved Treatable Patients", data["unsolved_treat_n"])
-
-    show_image(
-        os.path.join("outputs", "fig08_treatable_diseases.png"),
-        "Treatable diseases"
-    )
-
-
-# ─────────────────────────────
-# NEURO
-# ─────────────────────────────
-elif page == "Neuro Burden":
-    st.header("Neurodevelopmental Disease Burden")
-
-    st.metric("Neuro Cases", data["neuro_n"])
-
-    show_image(
-        os.path.join("outputs", "fig09_neuro_burden.png"),
-        "Neuro burden"
-    )
-
-
-# ─────────────────────────────
-# ML MODEL
-# ─────────────────────────────
-elif page == "ML Gene Model":
-    st.header("Gene Prioritization Model")
-
-    col1, col2, col3 = st.columns(3)
-    col1.metric("CV Accuracy", round(data["cv_acc"], 3))
-    col2.metric("Top-3 Accuracy", round(data["top3"], 3))
-    col3.metric("Top-5 Accuracy", round(data["top5"], 3))
-
-    show_image(
-        os.path.join("outputs", "fig11_gene_model.png"),
-        "Gene model"
-    )
-
-
-# ─────────────────────────────
-# PATHOGENICITY
-# ─────────────────────────────
-elif page == "Pathogenicity Model":
-    st.header("Pathogenicity Classifier")
+    fig1, fig2, fig3, fig4 = plot_cohort_overview(df)
 
     col1, col2 = st.columns(2)
-    col1.metric("ROC-AUC", round(data["auc"], 3))
-    col2.metric("Avg Precision", round(data["ap"], 3))
+    col1.plotly_chart(fig1, use_container_width=True)
+    col2.plotly_chart(fig2, use_container_width=True)
 
-    show_image(
-        os.path.join("outputs", "fig13_pathogenicity_PR.png"),
-        "Pathogenicity model"
+    col1, col2 = st.columns(2)
+    col1.plotly_chart(fig3, use_container_width=True)
+    col2.plotly_chart(fig4, use_container_width=True)
+
+
+# =========================
+# MODULE 2 — POPULATION
+# =========================
+elif tabs == "🌍 Population Genomics":
+    st.header("Population Stratification")
+
+    stats = get_population_stats(df)
+    fig = plot_population(stats)
+
+    st.plotly_chart(fig, use_container_width=True)
+    st.dataframe(stats)
+
+
+# =========================
+# MODULE 3 — FOUNDERS
+# =========================
+elif tabs == "🧬 Founder Mutations":
+    st.header("Founder Mutation Discovery")
+
+    saudi = df[df["source"] == "PAVS-Saudi"]
+    founders = get_founders(saudi)
+
+    fig = plot_founders(founders)
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.subheader("Download Data")
+    st.download_button(
+        "Download Founder Table",
+        founders.to_csv(index=False),
+        "founders.csv"
     )
 
 
-# ─────────────────────────────
-# VUS
-# ─────────────────────────────
-elif page == "VUS Reclassification":
-    st.header("VUS Reclassification")
+# =========================
+# MODULE 4 — AR ARCHITECTURE
+# =========================
+elif tabs == "🧬 AR Architecture":
+    st.header("Autosomal Recessive Architecture")
 
-    st.metric("VUS Candidates", data["vus_n"])
-
-    st.write("Generated file:")
-    st.code("outputs/data_VUS_reclassification.csv")
+    fig = plot_ar_architecture(df)
+    st.plotly_chart(fig, use_container_width=True)
 
 
-# ─────────────────────────────
-# ALL FIGURES
-# ─────────────────────────────
-elif page == "All Figures":
-    st.header("All Generated Figures")
+# =========================
+# MODULE 5 — TREATABLE
+# =========================
+elif tabs == "💊 Treatable Diseases":
+    st.header("Treatable Rare Diseases")
 
-    out_dir = "outputs"
+    treat_df = get_treatable(df)
+    fig = plot_treatable(treat_df)
 
-    if os.path.exists(out_dir):
-        figs = sorted(os.listdir(out_dir))
+    st.plotly_chart(fig, use_container_width=True)
+    st.dataframe(treat_df.head(100))
 
-        for f in figs:
-            if f.endswith(".png"):
-                show_image(os.path.join(out_dir, f), f)
-    else:
-        st.error("Outputs folder missing. Run pipeline first.")
+
+# =========================
+# MODULE 6 — NEURO
+# =========================
+elif tabs == "🧠 Neuro Burden":
+    st.header("Neurodevelopmental Disease Burden")
+
+    neuro_df = get_neuro(df)
+    fig = plot_neuro(neuro_df)
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
+# =========================
+# MODULE 7 — DISEASE SIMILARITY
+# =========================
+elif tabs == "🔬 Disease Similarity":
+    st.header("Disease Phenotype Similarity")
+
+    fig = plot_disease_similarity(df)
+    st.plotly_chart(fig, use_container_width=True)
+
+
+# =========================
+# MODULE 8 — GENE MODEL (LAZY LOAD)
+# =========================
+elif tabs == "🤖 Gene Model":
+    st.header("Gene Prioritization Model")
+
+    if st.button("Run Model"):
+        with st.spinner("Training model..."):
+            results = run_gene_model(df)
+
+        fig = plot_gene_model(results)
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.json(results)
+
+
+# =========================
+# MODULE 9 — PATHOGENICITY
+# =========================
+elif tabs == "🧪 Pathogenicity Model":
+    st.header("ACMG Pathogenicity Classifier")
+
+    if st.button("Run Pathogenicity Model"):
+        with st.spinner("Running classifier..."):
+            precision, recall = run_pathogenicity_model(df)
+
+        fig = plot_pathogenicity_curve(precision, recall)
+        st.plotly_chart(fig, use_container_width=True)
+
+
+# =========================
+# MODULE 10 — VUS
+# =========================
+elif tabs == "⚠️ VUS Analysis":
+    st.header("VUS Reclassification Candidates")
+
+    vus = get_vus(df)
+
+    st.dataframe(vus.head(100))
+
+    st.download_button(
+        "Download VUS Candidates",
+        vus.to_csv(index=False),
+        "vus_candidates.csv"
+    )
+
+
+# =========================
+# MODULE 11 — HPO CO-OCCURRENCE
+# =========================
+elif tabs == "🔗 HPO Co-occurrence":
+    st.header("HPO Co-occurrence Matrix")
+
+    fig = plot_hpo_cooccurrence(df)
+    st.plotly_chart(fig, use_container_width=True)
+
+
+# =========================
+# MODULE 12 — ADAT3
+# =========================
+elif tabs == "🧬 ADAT3 Deep Dive":
+    st.header("ADAT3 Founder Mutation Analysis")
+
+    fig = plot_adat3(df)
+    st.plotly_chart(fig, use_container_width=True)
+
+
+# =========================
+# MODULE 13 — FINAL DASHBOARD
+# =========================
+elif tabs == "📊 Final Clinical Dashboard":
+    st.header("Clinical Summary Dashboard")
+
+    stats = get_population_stats(df)
+    founders = get_founders(df[df["source"] == "PAVS-Saudi"])
+    neuro_df = get_neuro(df)
+    vus = get_vus(df)
+    treat_df = get_treatable(df)
+
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Total Cases", len(df))
+    col2.metric("Unique Genes", df["gene_symbol"].nunique())
+    col3.metric("Solved Cases", df["is_solved"].sum())
+
+    st.divider()
+
+    st.subheader("Founder Mutations")
+    st.plotly_chart(plot_founders(founders), use_container_width=True)
+
+    st.subheader("Neuro Burden")
+    st.plotly_chart(plot_neuro(neuro_df), use_container_width=True)
+
+    st.subheader("Treatable Diseases")
+    st.plotly_chart(plot_treatable(treat_df), use_container_width=True)
+
+    st.subheader("VUS Candidates")
+    st.dataframe(vus.head(50))
