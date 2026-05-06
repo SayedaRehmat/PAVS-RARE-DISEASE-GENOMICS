@@ -993,5 +993,4 @@ def run_for_dashboard(data_path="data/PAVS_cases.tsv"):
 
 # ─────────────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    # Comment this line when using Streamlit
-    run_all()
+    run_for_dashboard()
