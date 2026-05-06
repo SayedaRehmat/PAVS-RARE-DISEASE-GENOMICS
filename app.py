@@ -1,30 +1,76 @@
 import streamlit as st
-import os
-
-from src.analysis import run_pipeline_for_ui
+from src.analysis import build_system
 
 st.set_page_config(layout="wide")
+st.title("Population-Aware Rare Disease Discovery Platform")
 
-st.title("🧬 PAVS Rare Disease Genomics Platform")
+@st.cache_data
+def load():
+    return build_system()
 
-if st.button("Run Full Analysis"):
+data = load()
 
-    with st.spinner("Running full pipeline..."):
-        results = run_pipeline_for_ui()
+df = data["df"]
 
-    st.success("Analysis Complete")
+page = st.sidebar.radio("Navigation", [
+    "Overview",
+    "Founder Mutations",
+    "Treatable Patients",
+    "VUS Reclassification",
+    "Patient Explorer"
+])
 
-    # Show summary
-    st.subheader("📊 Summary")
-    st.write(results)
+# ─────────────────────────
+if page == "Overview":
+    col1, col2, col3 = st.columns(3)
 
-    st.markdown("---")
+    col1.metric("Total Cases", data["total_cases"])
+    col2.metric("Solved", data["solved"])
+    col3.metric("Homozygous %", f"{data['hom_pct']*100:.1f}%")
 
-    # Show final dashboard (main output)
-    final_fig = "outputs/fig00_FINAL_DASHBOARD.png"
+    st.subheader("Key Insight")
+    st.info("High homozygosity indicates strong consanguinity-driven disease architecture.")
 
-    if os.path.exists(final_fig):
-        st.image(final_fig, use_container_width=True)
+# ─────────────────────────
+elif page == "Founder Mutations":
+    st.subheader("Top Recurrent Variants")
 
-    else:
-        st.warning("Final dashboard not found")
+    st.dataframe(
+        data["founders"].head(30)
+    )
+
+# ─────────────────────────
+elif page == "Treatable Patients":
+    st.subheader("Unsolved Patients with Treatable Genes")
+
+    st.warning(f"{len(data['treatable_unsolved'])} patients could benefit TODAY")
+
+    st.dataframe(
+        data["treatable_unsolved"][
+            ["case_id","gene_symbol","hpo_terms"]
+        ].head(50)
+    )
+
+# ─────────────────────────
+elif page == "VUS Reclassification":
+    st.subheader("Top VUS Candidates")
+
+    threshold = st.slider("Score threshold", 0.0, 10.0, 3.0)
+
+    filtered = data["vus"][data["vus"]["score"] > threshold]
+
+    st.dataframe(
+        filtered[
+            ["gene_symbol","hgvs_c","score","hpo_terms"]
+        ].head(50)
+    )
+
+# ─────────────────────────
+elif page == "Patient Explorer":
+    st.subheader("Patient-Level Analysis")
+
+    case = st.selectbox("Select Case", df["case_id"].unique())
+
+    case_df = df[df["case_id"] == case]
+
+    st.write(case_df.T)
