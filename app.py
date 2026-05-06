@@ -1,79 +1,117 @@
 import streamlit as st
-from src.analysis import build_system
+import pandas as pd
+import os
+from src.analysis import run_for_dashboard
 
 st.set_page_config(layout="wide")
-st.title("Population-Aware Rare Disease Discovery Platform")
 
+st.title("Population-Aware Variant Reclassification System")
+st.caption("Full pipeline: population genomics • ML • causal discovery")
+
+# ─────────────────────────────
 @st.cache_data
 def load():
-    return build_system()
+    return run_for_dashboard()
 
 data = load()
-
 df = data["df"]
 
-# Sidebar navigation
-page = st.sidebar.radio("Navigation", [
+# ─────────────────────────────
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", [
     "Overview",
+    "Population Genomics",
     "Founder Mutations",
-    "Treatable Patients",
+    "Treatable Diseases",
+    "Neuro Burden",
+    "ML Gene Model",
+    "Pathogenicity Model",
     "VUS Reclassification",
-    "Patient Explorer"
+    "Generated Figures"
 ])
 
-# ─────────────────────────────────────
+# ─────────────────────────────
 if page == "Overview":
+    st.header("Cohort Overview")
+
     col1, col2, col3 = st.columns(3)
+    col1.metric("Total Cases", len(df))
+    col2.metric("Solved Cases", int(df["is_solved"].sum()))
+    col3.metric("Unique Genes", df["gene_symbol"].nunique())
 
-    col1.metric("Total Cases", data["overview"]["total_cases"])
-    col2.metric("Solved Cases", data["overview"]["solved_cases"])
-    col3.metric("Homozygous %", f"{data['overview']['homozygous_pct']*100:.1f}%")
+    st.subheader("Key Insight")
+    st.info("High homozygosity in Saudi cohort indicates strong consanguinity-driven disease architecture.")
 
-    st.info("High homozygosity suggests strong consanguinity-driven disease patterns.")
+    st.dataframe(df.head())
 
-# ─────────────────────────────────────
+# ─────────────────────────────
+elif page == "Population Genomics":
+    st.header("Population Stratification")
+
+    stats = data["stats"]
+    st.dataframe(pd.DataFrame(stats).T)
+
+    st.image("outputs/fig05_population_comparison.png")
+
+# ─────────────────────────────
 elif page == "Founder Mutations":
-    st.subheader("Top Recurrent Variants")
+    st.header("Founder Mutation Discovery")
 
-    st.dataframe(
-        data["founders"].head(30),
-        use_container_width=True
-    )
+    st.dataframe(data["founders"].head(30))
 
-# ─────────────────────────────────────
-elif page == "Treatable Patients":
-    st.subheader("Unsolved Patients with Treatable Conditions")
+    st.image("outputs/fig06_founder_mutations.png")
 
-    st.warning(f"{len(data['treatable_unsolved'])} patients may benefit from existing treatments")
+# ─────────────────────────────
+elif page == "Treatable Diseases":
+    st.header("Treatable Rare Disease Mining")
 
-    st.dataframe(
-        data["treatable_unsolved"][
-            ["case_id", "gene_symbol", "treatment", "hpo_terms"]
-        ].head(50),
-        use_container_width=True
-    )
+    st.metric("Unsolved Treatable Patients", data["unsolved_treat_n"])
 
-# ─────────────────────────────────────
+    st.image("outputs/fig08_treatable_diseases.png")
+
+# ─────────────────────────────
+elif page == "Neuro Burden":
+    st.header("Neurodevelopmental Disease Burden")
+
+    st.metric("Neuro Cases", data["neuro_n"])
+
+    st.image("outputs/fig09_neuro_burden.png")
+
+# ─────────────────────────────
+elif page == "ML Gene Model":
+    st.header("Gene Prioritization Model")
+
+    col1, col2, col3 = st.columns(3)
+    col1.metric("CV Accuracy", round(data["cv_acc"], 3))
+    col2.metric("Top-3 Accuracy", round(data["top3"], 3))
+    col3.metric("Top-5 Accuracy", round(data["top5"], 3))
+
+    st.image("outputs/fig11_gene_model.png")
+
+# ─────────────────────────────
+elif page == "Pathogenicity Model":
+    st.header("Variant Pathogenicity Classifier")
+
+    col1, col2 = st.columns(2)
+    col1.metric("ROC-AUC", round(data["auc"], 3))
+    col2.metric("Avg Precision", round(data["ap"], 3))
+
+    st.image("outputs/fig13_pathogenicity_PR.png")
+
+# ─────────────────────────────
 elif page == "VUS Reclassification":
-    st.subheader("Top VUS Candidates")
+    st.header("VUS Reclassification Candidates")
 
-    threshold = st.slider("Minimum Score", 0.0, 10.0, 3.0)
+    st.metric("VUS Candidates", data["vus_n"])
 
-    filtered = data["vus"][data["vus"]["score"] > threshold]
+    st.write("Top candidates saved in outputs/data_VUS_reclassification.csv")
 
-    st.dataframe(
-        filtered[
-            ["gene_symbol", "hgvs_c", "score", "hpo_terms"]
-        ].head(50),
-        use_container_width=True
-    )
+# ─────────────────────────────
+elif page == "Generated Figures":
+    st.header("All Figures")
 
-# ─────────────────────────────────────
-elif page == "Patient Explorer":
-    st.subheader("Patient-Level View")
+    figs = sorted(os.listdir("outputs"))
 
-    case = st.selectbox("Select Case ID", df["case_id"].unique())
-
-    case_df = df[df["case_id"] == case]
-
-    st.dataframe(case_df.T)
+    for f in figs:
+        if f.endswith(".png"):
+            st.image(os.path.join("outputs", f), caption=f)
