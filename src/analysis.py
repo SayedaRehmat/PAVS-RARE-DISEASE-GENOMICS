@@ -950,6 +950,8 @@ def run_for_dashboard(data_path="data/PAVS_cases.tsv"):
     }
 # ... all your modules above ...
 # ─────────────────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    run_for_dashboard()
 def run_for_dashboard(data_path="data/PAVS_cases.tsv"):
     """
     Lightweight wrapper for UI dashboard.
