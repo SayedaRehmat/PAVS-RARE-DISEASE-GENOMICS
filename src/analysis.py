@@ -948,3 +948,17 @@ def run_for_dashboard(data_path="data/PAVS_cases.tsv"):
         "vus_n": vus_n,
         "n_genes": n_genes
     }
+# ... all your modules above ...
+
+def run_all(...):
+    ...
+
+# ─────────────────────────────────────────────────────────────────────────────
+def run_for_dashboard(data_path="data/PAVS_cases.tsv"):
+    ...
+    return {...}
+
+# ─────────────────────────────────────────────────────────────────────────────
+if __name__ == "__main__":
+    # Comment this line when using Streamlit
+    run_all()
