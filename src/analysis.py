@@ -25,15 +25,9 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
 OUT_DIR = "outputs"
-import shutil
-
-if os.path.exists(OUT_DIR):
-    if os.path.isdir(OUT_DIR):
-        shutil.rmtree(OUT_DIR)
-    else:
-        os.remove(OUT_DIR)
-
-os.makedirs(OUT_DIR)
+import tempfile, os
+OUT_DIR = os.path.join(tempfile.gettempdir(), "pavs_outputs")
+os.makedirs(OUT_DIR, exist_ok=True)
 
 TREATABLE_GENES = {
     "SLC19A3": "Biotin+Thiamine (BTBGD) — URGENT",
