@@ -1,7 +1,11 @@
 import streamlit as st
 import pandas as pd
+
+import sys
 import os
-from src.analysis import run_for_dashboard
+sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
+
+from analysis import run_for_dashboard
 
 st.set_page_config(layout="wide")
 
