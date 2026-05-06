@@ -1,20 +1,8 @@
-"""
-src/analysis.py
-STREAMLIT-SAFE VERSION (NO DISK I/O)
-"""
-
-import warnings
-warnings.filterwarnings("ignore")
+# analysis_core.py
 
 import pandas as pd
 import numpy as np
-import matplotlib
-matplotlib.use("Agg")
-
-import matplotlib.pyplot as plt
-import seaborn as sns
 from collections import Counter
-import io
 
 from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
@@ -23,120 +11,157 @@ from sklearn.metrics import average_precision_score, precision_recall_curve
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
+# =========================
+# CONSTANTS (unchanged)
+# =========================
 
-# ─────────────────────────────────────────────
-# UTIL: FIGURE → STREAMLIT BUFFER
-# ─────────────────────────────────────────────
-def fig_to_bytes(fig):
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight", dpi=150)
-    buf.seek(0)
-    plt.close(fig)
-    return buf
+TREATABLE_GENES = {
+    "SLC19A3": "Biotin+Thiamine",
+    "GAA": "ERT",
+    "ATP7B": "Chelation",
+    "GBA": "ERT/SRT",
+    "PAH": "BH4",
+    "BTD": "Biotin",
+    "CBS": "Pyridoxine",
+}
 
+KNOWN_FOUNDERS = {
+    "ELAC2": "Saudi founder",
+    "ADAT3": "Pan-Arab founder",
+}
 
-# ─────────────────────────────────────────────
-# DATA LOADING
-# ─────────────────────────────────────────────
-def load_data(path="data/PAVS_cases.tsv"):
+NEURO_HPO = {
+    "HP:0001263": "Developmental delay",
+    "HP:0001249": "Intellectual disability",
+    "HP:0001250": "Seizure",
+}
+
+# =========================
+# LOAD DATA
+# =========================
+
+def load_pavs_data(path):
     df = pd.read_csv(path, sep="\t")
 
     df["is_solved"] = df["solved_status"] == "SOLVED"
-
     df["hpo_list"] = df["hpo_terms"].apply(
         lambda s: [x.split("|")[0].strip() for x in s.split(";")]
         if pd.notna(s) else []
     )
-
     df["hpo_count"] = df["hpo_list"].apply(len)
-    df["is_neuro"] = df["hpo_list"].apply(lambda x: len(x) > 0)
+    df["is_neuro"] = df["hpo_list"].apply(
+        lambda lst: any(h in NEURO_HPO for h in lst)
+    )
 
     return df, {}
 
+# =========================
+# MODULE 2: POPULATION
+# =========================
 
-# ─────────────────────────────────────────────
-# POPULATION ANALYSIS (FIXED)
-# ─────────────────────────────────────────────
-def run_population_analysis(df):
+def get_population_stats(df):
+    stats = {}
 
-    saudi = df[df["source"] == "PAVS-Saudi"]
-    ddd = df[df["source"] == "DDD"]
-    mixed = df[df["source"] == "PAVS-mixed"]
-
-    stats = {
-        "PAVS-Saudi": {
-            "n": len(saudi),
-            "solved_pct": saudi["is_solved"].mean() * 100,
-            "hom_pct": (saudi["zygosity_label"] == "homozygous").mean() * 100,
-        },
-        "DDD": {
-            "n": len(ddd),
-            "solved_pct": ddd["is_solved"].mean() * 100,
-            "hom_pct": (ddd["zygosity_label"] == "homozygous").mean() * 100,
+    for src in df["source"].unique():
+        sub = df[df["source"] == src]
+        stats[src] = {
+            "n": len(sub),
+            "solved_pct": sub["is_solved"].mean() * 100,
+            "hom_pct": (sub["zygosity_label"] == "homozygous").mean() * 100,
+            "median_hpo": sub["hpo_count"].median(),
         }
-    }
 
-    # FIGURE (IN MEMORY)
-    fig, ax = plt.subplots(figsize=(6, 4))
+    return pd.DataFrame(stats).T
 
-    keys = list(stats.keys())
-    vals = [stats[k]["hom_pct"] for k in keys]
+# =========================
+# MODULE 3: FOUNDERS
+# =========================
 
-    ax.bar(keys, vals, color=["red", "blue"])
-    ax.set_title("Homozygosity Comparison")
+def get_founders(df):
+    sub = df[df["gene_symbol"].notna() & df["hgvs_c"].notna()]
 
-    return stats, saudi, ddd, fig_to_bytes(fig)
+    gv = (
+        sub.groupby(["gene_symbol", "hgvs_c"])
+        .size()
+        .reset_index(name="n_cases")
+        .sort_values("n_cases", ascending=False)
+    )
 
+    founders = gv[gv["n_cases"] >= 3].copy()
+    founders["is_known"] = founders["gene_symbol"].isin(KNOWN_FOUNDERS)
 
-# ─────────────────────────────────────────────
-# FOUNDERS (FIXED)
-# ─────────────────────────────────────────────
-def run_founder_analysis(df, saudi):
+    return founders
 
-    founders = saudi.groupby("gene_symbol").size().reset_index(name="n")
-    founders = founders.sort_values("n", ascending=False).head(20)
+# =========================
+# MODULE 5: TREATABLE
+# =========================
 
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.barh(founders["gene_symbol"], founders["n"])
-    ax.set_title("Founder Mutations")
+def get_treatable(df):
+    treat = df[df["gene_symbol"].isin(TREATABLE_GENES)].copy()
+    unsolved = treat[treat["solved_status"] == "IN_PROGRESS"]
+    return treat, unsolved
 
-    return founders, fig_to_bytes(fig)
+# =========================
+# MODULE 6: NEURO
+# =========================
 
+def get_neuro(df):
+    return df[df["is_neuro"]].copy()
 
-# ─────────────────────────────────────────────
-# TREATABLE
-# ─────────────────────────────────────────────
-def run_treatable_analysis(df):
-    treatable = df[df["gene_symbol"].notna()]
-    return len(treatable)
+# =========================
+# MODULE 7: DISEASE SIMILARITY
+# =========================
 
+def get_disease_similarity(df):
+    diseases = df["disease_label"].dropna().unique()[:20]
 
-# ─────────────────────────────────────────────
-# NEURO
-# ─────────────────────────────────────────────
-def run_neuro_analysis(df, hpo_labels):
-    neuro = df[df["is_neuro"]]
-    return len(neuro)
+    dis_sets = {}
+    for d in diseases:
+        sub = df[df["disease_label"] == d]
+        terms = set(h for lst in sub["hpo_list"] for h in lst)
+        if terms:
+            dis_sets[d] = terms
 
+    names = list(dis_sets.keys())
+    n = len(names)
 
-# ─────────────────────────────────────────────
-# GENE MODEL
-# ─────────────────────────────────────────────
-def run_gene_model(df, saudi):
+    sim = np.zeros((n, n))
+    for i in range(n):
+        for j in range(n):
+            a, b = dis_sets[names[i]], dis_sets[names[j]]
+            sim[i, j] = len(a & b) / len(a | b) if (a | b) else 0
 
-    ml_df = saudi[saudi["gene_symbol"].notna()]
+    return sim, names
+
+# =========================
+# MODULE 8: GENE MODEL
+# =========================
+
+def run_gene_model(df):
+    sub = df[
+        df["is_solved"]
+        & df["gene_symbol"].notna()
+        & (df["hpo_list"].apply(len) > 0)
+    ]
+
+    gene_freq = sub["gene_symbol"].value_counts()
+    valid = gene_freq[gene_freq >= 5].index
+
+    ml_df = sub[sub["gene_symbol"].isin(valid)]
+
     mlb = MultiLabelBinarizer()
-
     X = mlb.fit_transform(ml_df["hpo_list"])
-    y = LabelEncoder().fit_transform(ml_df["gene_symbol"])
 
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
-    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
+    le = LabelEncoder()
+    y = le.fit_transform(ml_df["gene_symbol"])
 
-    cv_acc = cross_val_score(model, X, y, cv=cv).mean()
+    rf = RandomForestClassifier(n_estimators=200, n_jobs=-1)
 
-    model.fit(X, y)
-    proba = model.predict_proba(X)
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv_acc = cross_val_score(rf, X, y, cv=cv).mean()
+
+    rf.fit(X, y)
+    proba = rf.predict_proba(X)
 
     top3 = np.mean([
         y[i] in np.argsort(proba[i])[::-1][:3]
@@ -148,66 +173,80 @@ def run_gene_model(df, saudi):
         for i in range(len(y))
     ])
 
-    return cv_acc, top3, top5, len(set(ml_df["gene_symbol"]))
+    return {
+        "cv": cv_acc,
+        "top3": top3,
+        "top5": top5
+    }
 
+# =========================
+# MODULE 9: PATHOGENICITY
+# =========================
 
-# ─────────────────────────────────────────────
-# PATHOGENICITY
-# ─────────────────────────────────────────────
-def run_pathogenicity_model(df):
+def run_pathogenicity(df):
+    sub = df[df["acmg_classification"].notna()].copy()
 
-    auc = 0.89
-    ap = 0.78
+    sub["y"] = sub["acmg_classification"].isin(
+        ["PATHOGENIC", "LIKELY_PATHOGENIC"]
+    ).astype(int)
 
-    fig, ax = plt.subplots()
-    ax.plot([0, 1], [0, 1])
+    sub["hpo_count"] = sub["hpo_count"].fillna(0)
+
+    X = sub[["hpo_count"]].values
+    y = sub["y"].values
+
+    clf = RandomForestClassifier(n_estimators=100)
+
+    cv = StratifiedKFold(n_splits=5, shuffle=True)
+    auc = cross_val_score(clf, X, y, cv=cv, scoring="roc_auc").mean()
+
+    clf.fit(X, y)
+    prob = clf.predict_proba(X)[:, 1]
+
+    ap = average_precision_score(y, prob)
 
     return auc, ap
 
+# =========================
+# MODULE 10: VUS
+# =========================
 
-# ─────────────────────────────────────────────
-# VUS
-# ─────────────────────────────────────────────
-def run_vus_analysis(df):
-    vus = df[df["acmg_classification"] == "UNCERTAIN_SIGNIFICANCE"]
-    return len(vus)
+def get_vus(df):
+    vus = df[df["acmg_classification"] == "UNCERTAIN_SIGNIFICANCE"].copy()
 
+    gene_counts = df[df["is_solved"]]["gene_symbol"].value_counts()
 
-# ─────────────────────────────────────────────
-# STREAMLIT WRAPPER (FIXED)
-# ─────────────────────────────────────────────
-def run_for_dashboard(data_path="data/PAVS_cases.tsv"):
+    vus["gene_solved"] = vus["gene_symbol"].map(gene_counts).fillna(0)
 
-    df, hpo_labels = load_data(data_path)
+    vus["priority"] = vus["gene_solved"] * 0.6 + vus["hpo_count"]
 
-    stats, saudi, ddd, pop_fig = run_population_analysis(df)
-    founders, founder_fig = run_founder_analysis(df, saudi)
+    return vus.sort_values("priority", ascending=False)
 
-    unsolved_treat_n = run_treatable_analysis(df)
-    neuro_n = run_neuro_analysis(df, hpo_labels)
+# =========================
+# MODULE 11: HPO CO-OCCURRENCE
+# =========================
 
-    cv_acc, top3, top5, n_genes = run_gene_model(df, saudi)
-    auc, ap = run_pathogenicity_model(df)
-    vus_n = run_vus_analysis(df)
+def get_hpo_cooccurrence(df):
+    all_terms = df["hpo_list"].explode().dropna()
+    top = all_terms.value_counts().head(20).index.tolist()
 
-    return {
-        "df": df,
-        "stats": stats,
-        "founders": founders,
+    mat = np.zeros((20, 20))
 
-        "unsolved_treat_n": unsolved_treat_n,
-        "neuro_n": neuro_n,
+    for terms in df["hpo_list"]:
+        for i, h1 in enumerate(top):
+            for j, h2 in enumerate(top):
+                if h1 in terms and h2 in terms:
+                    mat[i, j] += 1
 
-        "cv_acc": cv_acc,
-        "top3": top3,
-        "top5": top5,
-        "n_genes": n_genes,
+    return mat, top
 
-        "auc": auc,
-        "ap": ap,
-        "vus_n": vus_n,
+# =========================
+# MODULE 12: ADAT3
+# =========================
 
-        # FIGURES (IMPORTANT FIX)
-        "pop_fig": pop_fig,
-        "founder_fig": founder_fig
-    }
+def get_adat3(df):
+    adat3 = df[df["gene_symbol"] == "ADAT3"].copy()
+
+    counts = adat3["hpo_list"].explode().value_counts()
+
+    return adat3, counts
