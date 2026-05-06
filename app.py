@@ -9,14 +9,13 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from analysis import run_for_dashboard
 
-
 # ─────────────────────────────
 # CONFIG
 # ─────────────────────────────
 st.set_page_config(layout="wide")
 
 st.title("Population-Aware Variant Reclassification System")
-st.caption("Full pipeline: population genomics • ML • causal discovery")
+st.caption("Genomics • ML • Causal Discovery Pipeline")
 
 
 # ─────────────────────────────
@@ -31,7 +30,17 @@ df = data["df"]
 
 
 # ─────────────────────────────
-# NAVIGATION
+# SAFE IMAGE LOADER
+# ─────────────────────────────
+def show_image(path, caption=""):
+    if path and os.path.exists(path):
+        st.image(path, caption=caption, use_container_width=True)
+    else:
+        st.warning(f"Missing figure: {path}")
+
+
+# ─────────────────────────────
+# SIDEBAR NAV
 # ─────────────────────────────
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", [
@@ -42,7 +51,8 @@ page = st.sidebar.radio("Go to", [
     "Neuro Burden",
     "ML Gene Model",
     "Pathogenicity Model",
-    "VUS Reclassification"
+    "VUS Reclassification",
+    "All Figures"
 ])
 
 
@@ -52,90 +62,128 @@ page = st.sidebar.radio("Go to", [
 if page == "Overview":
     st.header("Cohort Overview")
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Total Cases", len(df))
-    c2.metric("Solved Cases", int(df["is_solved"].sum()))
-    c3.metric("Unique Genes", df["gene_symbol"].nunique())
-
-    st.info(
-        "High homozygosity in Saudi cohort indicates strong consanguinity-driven disease architecture."
-    )
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total Cases", len(df))
+    col2.metric("Solved Cases", int(df["is_solved"].sum()))
+    col3.metric("Unique Genes", df["gene_symbol"].nunique())
 
     st.dataframe(df.head())
 
 
 # ─────────────────────────────
-# POPULATION GENOMICS
+# POPULATION
 # ─────────────────────────────
 elif page == "Population Genomics":
     st.header("Population Stratification")
 
     st.dataframe(pd.DataFrame(data["stats"]).T)
 
-    # FIX: in-memory image (NO FILES)
-    st.image(data["pop_fig"], caption="Population comparison")
+    show_image(
+        os.path.join("outputs", "fig05_population_comparison.png"),
+        "Population comparison"
+    )
 
 
 # ─────────────────────────────
-# FOUNDER MUTATIONS
+# FOUNDER
 # ─────────────────────────────
 elif page == "Founder Mutations":
     st.header("Founder Mutation Discovery")
 
     st.dataframe(data["founders"].head(30))
 
-    st.image(data["founder_fig"], caption="Founder mutations")
+    show_image(
+        os.path.join("outputs", "fig06_founder_mutations.png"),
+        "Founder mutations"
+    )
 
 
 # ─────────────────────────────
-# TREATABLE DISEASES
+# TREATABLE
 # ─────────────────────────────
 elif page == "Treatable Diseases":
-    st.header("Treatable Rare Disease Mining")
+    st.header("Treatable Disease Mining")
 
     st.metric("Unsolved Treatable Patients", data["unsolved_treat_n"])
 
+    show_image(
+        os.path.join("outputs", "fig08_treatable_diseases.png"),
+        "Treatable diseases"
+    )
+
 
 # ─────────────────────────────
-# NEURO BURDEN
+# NEURO
 # ─────────────────────────────
 elif page == "Neuro Burden":
     st.header("Neurodevelopmental Disease Burden")
 
     st.metric("Neuro Cases", data["neuro_n"])
 
+    show_image(
+        os.path.join("outputs", "fig09_neuro_burden.png"),
+        "Neuro burden"
+    )
+
 
 # ─────────────────────────────
-# ML GENE MODEL
+# ML MODEL
 # ─────────────────────────────
 elif page == "ML Gene Model":
     st.header("Gene Prioritization Model")
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("CV Accuracy", round(data["cv_acc"], 3))
-    c2.metric("Top-3 Accuracy", round(data["top3"], 3))
-    c3.metric("Top-5 Accuracy", round(data["top5"], 3))
+    col1, col2, col3 = st.columns(3)
+    col1.metric("CV Accuracy", round(data["cv_acc"], 3))
+    col2.metric("Top-3 Accuracy", round(data["top3"], 3))
+    col3.metric("Top-5 Accuracy", round(data["top5"], 3))
+
+    show_image(
+        os.path.join("outputs", "fig11_gene_model.png"),
+        "Gene model"
+    )
 
 
 # ─────────────────────────────
-# PATHOGENICITY MODEL
+# PATHOGENICITY
 # ─────────────────────────────
 elif page == "Pathogenicity Model":
-    st.header("Variant Pathogenicity Classifier")
+    st.header("Pathogenicity Classifier")
 
-    c1, c2 = st.columns(2)
-    c1.metric("ROC-AUC", round(data["auc"], 3))
-    c2.metric("Avg Precision", round(data["ap"], 3))
+    col1, col2 = st.columns(2)
+    col1.metric("ROC-AUC", round(data["auc"], 3))
+    col2.metric("Avg Precision", round(data["ap"], 3))
+
+    show_image(
+        os.path.join("outputs", "fig13_pathogenicity_PR.png"),
+        "Pathogenicity model"
+    )
 
 
 # ─────────────────────────────
-# VUS RECLASSIFICATION
+# VUS
 # ─────────────────────────────
 elif page == "VUS Reclassification":
-    st.header("VUS Reclassification Candidates")
+    st.header("VUS Reclassification")
 
     st.metric("VUS Candidates", data["vus_n"])
 
-    st.write(
-        "Top candidates exported inside pipeline (now handled in-memory or optional export)."
-    )
+    st.write("Generated file:")
+    st.code("outputs/data_VUS_reclassification.csv")
+
+
+# ─────────────────────────────
+# ALL FIGURES
+# ─────────────────────────────
+elif page == "All Figures":
+    st.header("All Generated Figures")
+
+    out_dir = "outputs"
+
+    if os.path.exists(out_dir):
+        figs = sorted(os.listdir(out_dir))
+
+        for f in figs:
+            if f.endswith(".png"):
+                show_image(os.path.join(out_dir, f), f)
+    else:
+        st.error("Outputs folder missing. Run pipeline first.")
