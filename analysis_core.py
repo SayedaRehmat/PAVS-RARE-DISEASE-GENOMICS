@@ -250,3 +250,37 @@ def get_adat3(df):
     counts = adat3["hpo_list"].explode().value_counts()
 
     return adat3, counts
+# =========================
+# STREAMLIT COMPATIBILITY WRAPPERS
+# =========================
+
+def load_data(path):
+    return load_pavs_data(path)
+
+
+def run_pathogenicity_model(df):
+    # convert to precision-recall for Plotly
+    sub = df[df["acmg_classification"].notna()].copy()
+
+    sub["y"] = sub["acmg_classification"].isin(
+        ["PATHOGENIC", "LIKELY_PATHOGENIC"]
+    ).astype(int)
+
+    sub["hpo_count"] = sub["hpo_count"].fillna(0)
+
+    X = sub[["hpo_count"]].values
+    y = sub["y"].values
+
+    clf = RandomForestClassifier(n_estimators=100)
+
+    clf.fit(X, y)
+    prob = clf.predict_proba(X)[:, 1]
+
+    precision, recall, _ = precision_recall_curve(y, prob)
+
+    return precision, recall
+
+
+def get_treatable_df(df):
+    treat, _ = get_treatable(df)
+    return treat
