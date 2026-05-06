@@ -1,184 +1,127 @@
 # plots_plotly.py
 
-import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
+import numpy as np
+import plotly.express as px
 
-from analysis_core import (
-    get_population_stats,
-    get_disease_similarity,
-    get_hpo_cooccurrence,
-    get_adat3
-)
+
+# =========================
+# SAFE HELPER
+# =========================
+
+def safe_counts(series, top_n=10, col_name="label"):
+    if series is None or len(series) == 0:
+        return pd.DataFrame({col_name: [], "count": []})
+
+    df = series.value_counts().head(top_n).reset_index()
+    df.columns = [col_name, "count"]
+    return df
+
 
 # =========================
 # MODULE 1: EDA
 # =========================
+
 def plot_cohort_overview(df):
-    fig1 = px.bar(
-        df["solved_status"].value_counts().reset_index(),
-        x="index", y="solved_status",
-        title="Solved Status"
-    )
 
-    fig2 = px.pie(
-        df, names="source",
-        title="Source Distribution"
-    )
+    # Solved status
+    vc = safe_counts(df["solved_status"], col_name="status")
+    fig1 = px.bar(vc, x="status", y="count", title="Solved Status")
 
-    fig3 = px.histogram(
-        df, x="hpo_count",
-        nbins=30,
-        title="HPO Terms per Case"
-    )
+    # Source distribution
+    vc2 = safe_counts(df["source"], col_name="source")
+    fig2 = px.pie(vc2, names="source", values="count", title="Source Distribution")
 
-    fig4 = px.bar(
-        df["acmg_classification"].value_counts().reset_index(),
-        x="index", y="acmg_classification",
-        title="ACMG Classification"
-    )
+    # Zygosity
+    vc3 = safe_counts(df["zygosity_label"], col_name="zygosity")
+    fig3 = px.bar(vc3, x="zygosity", y="count", title="Zygosity")
+
+    # HPO count
+    fig4 = px.histogram(df, x="hpo_count", nbins=20, title="HPO Count Distribution")
 
     return fig1, fig2, fig3, fig4
 
 
 # =========================
-# MODULE 2: POPULATION
-# =========================
-def plot_population(stats_df):
-    df = stats_df.reset_index()
-
-    fig = px.bar(
-        df,
-        x="index",
-        y=["solved_pct", "hom_pct"],
-        barmode="group",
-        title="Population Comparison"
-    )
-    return fig
-
-
-# =========================
 # MODULE 3: FOUNDERS
 # =========================
-def plot_founders(founders):
-    top = founders.head(20)
+
+def plot_founders(founders_df):
+
+    if founders_df.empty:
+        return px.bar(title="No founder variants found")
+
+    top = founders_df.head(10)
 
     fig = px.bar(
         top,
-        x="n_cases",
-        y="gene_symbol",
-        orientation="h",
-        title="Top Founder Mutations",
-        hover_data=["hgvs_c"]
+        x="gene_symbol",
+        y="n_cases",
+        color="is_known",
+        title="Top Founder Variants"
     )
-    fig.update_layout(yaxis=dict(autorange="reversed"))
-    return fig
 
-
-# =========================
-# MODULE 4: AR ARCHITECTURE
-# =========================
-def plot_ar_architecture(df):
-    zyg = df["zygosity_label"].value_counts(normalize=True) * 100
-
-    fig = px.bar(
-        x=zyg.index,
-        y=zyg.values,
-        labels={"x": "Zygosity", "y": "%"},
-        title="Zygosity Distribution"
-    )
     return fig
 
 
 # =========================
 # MODULE 5: TREATABLE
 # =========================
+
 def plot_treatable(treat_df):
-    top = treat_df["gene_symbol"].value_counts().head(15).reset_index()
+
+    if treat_df.empty:
+        return px.bar(title="No treatable genes found")
+
+    top = safe_counts(treat_df["gene_symbol"], col_name="gene")
 
     fig = px.bar(
         top,
-        x="index",
-        y="gene_symbol",
-        title="Treatable Genes",
-        labels={"index": "Gene", "gene_symbol": "Cases"}
+        x="gene",
+        y="count",
+        title="Treatable Gene Burden"
     )
+
     return fig
 
 
 # =========================
 # MODULE 6: NEURO
 # =========================
+
 def plot_neuro(neuro_df):
-    top = neuro_df["gene_symbol"].value_counts().head(15).reset_index()
+
+    if neuro_df.empty:
+        return px.bar(title="No neuro cases")
+
+    top = safe_counts(neuro_df["gene_symbol"], col_name="gene")
 
     fig = px.bar(
         top,
-        x="gene_symbol",
-        y="index",
-        orientation="h",
+        x="gene",
+        y="count",
         title="Top Neuro Genes"
     )
-    fig.update_layout(yaxis=dict(autorange="reversed"))
+
     return fig
 
 
 # =========================
 # MODULE 7: DISEASE SIMILARITY
 # =========================
-def plot_disease_similarity(df):
-    sim, names = get_disease_similarity(df)
 
-    fig = go.Figure(
-        data=go.Heatmap(
-            z=sim,
-            x=names,
-            y=names,
-            colorscale="Reds"
-        )
-    )
+def plot_disease_similarity(sim, names):
 
-    fig.update_layout(
-        title="Disease Similarity (HPO)",
-        xaxis_tickangle=45
-    )
-    return fig
+    if len(names) == 0:
+        return px.imshow([[0]], title="No similarity data")
 
+    df = pd.DataFrame(sim, index=names, columns=names)
 
-# =========================
-# MODULE 8: GENE MODEL
-# =========================
-def plot_gene_model(results):
-    fig = px.bar(
-        x=["CV", "Top-3", "Top-5"],
-        y=[
-            results["cv"] * 100,
-            results["top3"] * 100,
-            results["top5"] * 100
-        ],
-        labels={"x": "Metric", "y": "%"},
-        title="Gene Model Performance"
-    )
-    return fig
-
-
-# =========================
-# MODULE 9: PATHOGENICITY
-# =========================
-def plot_pathogenicity_curve(precision, recall):
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(
-        x=recall,
-        y=precision,
-        mode='lines',
-        name="PR Curve"
-    ))
-
-    fig.update_layout(
-        title="Precision-Recall Curve",
-        xaxis_title="Recall",
-        yaxis_title="Precision"
+    fig = px.imshow(
+        df,
+        text_auto=True,
+        aspect="auto",
+        title="Disease Similarity (Jaccard)"
     )
 
     return fig
@@ -187,40 +130,46 @@ def plot_pathogenicity_curve(precision, recall):
 # =========================
 # MODULE 11: HPO CO-OCCURRENCE
 # =========================
-def plot_hpo_cooccurrence(df):
-    mat, labels = get_hpo_cooccurrence(df)
 
-    fig = go.Figure(
-        data=go.Heatmap(
-            z=mat,
-            x=labels,
-            y=labels,
-            colorscale="Blues"
-        )
+def plot_hpo_cooccurrence(mat, terms):
+
+    if len(terms) == 0:
+        return px.imshow([[0]], title="No HPO data")
+
+    df = pd.DataFrame(mat, index=terms, columns=terms)
+
+    fig = px.imshow(
+        df,
+        aspect="auto",
+        title="HPO Co-occurrence"
     )
 
-    fig.update_layout(
-        title="HPO Co-occurrence",
-        xaxis_tickangle=45
-    )
     return fig
 
 
 # =========================
 # MODULE 12: ADAT3
 # =========================
-def plot_adat3(df):
-    _, counts = get_adat3(df)
 
-    top = counts.head(15).reset_index()
+def plot_adat3(df):
+
+    adat3 = df[df["gene_symbol"] == "ADAT3"]
+
+    if adat3.empty:
+        return px.bar(title="No ADAT3 cases")
+
+    counts = adat3["hpo_list"].explode()
+
+    if counts.empty:
+        return px.bar(title="No HPO terms")
+
+    top = safe_counts(counts, top_n=15, col_name="hpo")
 
     fig = px.bar(
         top,
-        x="count",
-        y="index",
-        orientation="h",
+        x="hpo",
+        y="count",
         title="ADAT3 HPO Profile"
     )
 
-    fig.update_layout(yaxis=dict(autorange="reversed"))
     return fig
