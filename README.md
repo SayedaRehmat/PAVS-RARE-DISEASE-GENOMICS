@@ -326,21 +326,20 @@ The repository includes a fully interactive Streamlit dashboard for exploration 
 * variant prioritization
 * visual analytics
 
-Launch locally:
+Launch :
 
 ```bash
-streamlit run app.py
+https://pavs-rare-disease-genomics-xwf2r7z3xdmms8w4xfyagg.streamlit.app/
 ```
 
 ---
 
-# Installation
+# 
 
-## Clone Repository
+## 
 
-```bash
-git clone <repository-url>
-cd PAVS_GITHUB
+```
+
 ```
 
 ---
