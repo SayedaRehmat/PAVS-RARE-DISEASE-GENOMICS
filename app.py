@@ -399,7 +399,7 @@ elif section == "AI Gene Prioritization":
     """, unsafe_allow_html=True)
 
     st.info(
-        "Upload phenotype terms or explore unresolved case predictions."
+        
     )
 
     if not pred_df.empty:
