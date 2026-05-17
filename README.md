@@ -1,11 +1,11 @@
-# 🧬 PAVS Rare Disease Genomics
+#  PAVS Rare Disease Genomics
 ### HPO-Driven Gene Prioritization | Saudi Founder Mutation Discovery | Population Genomics
 
 
 
 ---
 
-## 🎯 Problem Statement
+## Problem Statement
 
 Rare genetic diseases affect **~300 million people worldwide**, yet more than **50% remain undiagnosed** after clinical exome sequencing. In Saudi Arabia, this burden is amplified — the country has one of the world's highest consanguinity rates (>50% of marriages), leading to elevated autosomal recessive disease frequency and an enormous unmet clinical need.
 
@@ -47,7 +47,7 @@ This project performs a **complete research-grade analysis** of the PAVS dataset
 
 ---
 
-## 🏆 Key Scientific Findings
+##  Key Scientific Findings
 
 ### 1. Population Signature — Consanguinity Confirmed
 Saudi cohort shows **52.2% homozygous** variants vs **0% in DDD (UK)**. This directly reflects Saudi Arabia's consanguineous marriage structure and confirms the dataset's authenticity as a genuine population-specific rare disease registry.
@@ -76,7 +76,7 @@ Random Forest trained only on Saudi cohort HPO data achieves:
 
 ---
 
-## 🗂️ Repository Structure
+##  Repository Structure
 
 ```
 PAVS-RARE-DISEASE-GENOMICS/
@@ -119,7 +119,7 @@ PAVS-RARE-DISEASE-GENOMICS/
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 ### Option 1 — Analysis Pipeline Only (Google Colab / local)
 
@@ -185,7 +185,7 @@ for fig in sorted(glob.glob("outputs/fig*.png")):
 
 ---
 
-## 📊 Output Files
+##  Output Files
 
 | File | Description |
 |------|-------------|
@@ -221,21 +221,11 @@ Matches published benchmarks on real clinical data with equivalent class imbalan
 
 ---
 
-## 🎓 KAUST Research Alignment
-
-This project directly addresses research priorities of:
-
-- **CBRC (Computational Bioscience Research Center)** — variant prioritization, rare disease genomics
-- **Bio-Ontology Research Group** (Prof. Robert Hoehndorf) — HPO-based gene–disease ML systems
-- **Prof. Xin Gao Lab** — AI approaches to genomics and precision medicine
-- **Saudi Vision 2030** — building precision medicine infrastructure for the Kingdom
-
-**Statement for application:**
-> *"I built an HPO-driven ML pipeline on the PAVS dataset — a Saudi Arabian rare disease registry of 7,510 cases. My analysis recovered 129 Saudi founder mutation candidates (including all published founders), quantified the consanguinity-driven AR architecture, and achieved 98.5% Top-3 gene prioritization accuracy on Saudi-only data. I identified 10 unsolved patients with available treatments and generated ranked diagnostic candidates for 1,522 unresolved cases — predictions validated by clinical spot-checks. This work directly complements KAUST CBRC's variant prioritization research program."*
+## 
 
 ---
 
-## 📚 Key References
+## Key References
 
 1. **Abdelhakim M et al. (2026).** PAVS: Pan-Arab Variant System. *medRxiv.* doi:10.64898/2026.04.05.26350189
 2. **Kim J et al. (2024).** Utility of LLMs for phenotype-driven gene prioritization. *Am J Hum Genet.* doi:10.1016/j.ajhg.2024.08.010
@@ -249,7 +239,6 @@ This project directly addresses research priorities of:
 ## 👩‍🔬 Author
 
 **Sayeda Rehmat**  
-KAUST Scholarship Applicant — Computational Biology & Rare Disease Genomics  
 [GitHub: SayedaRehmat](https://github.com/SayedaRehmat/PAVS-RARE-DISEASE-GENOMICS)
 
 ---
