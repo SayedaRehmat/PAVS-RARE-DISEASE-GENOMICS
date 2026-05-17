@@ -204,7 +204,7 @@ font-family:'JetBrains Mono', monospace;
 color:#4F8EF7;
 margin-left:.5rem;
 ">
-
+KAUST · CBRC · Bio-Ontology Group
 </span>
 
 </div>
@@ -274,7 +274,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # SIDEBAR
 # =========================================================
 
-st.sidebar.title(" Dashboard Navigation")
+st.sidebar.title("🧬 Dashboard Navigation")
 
 section = st.sidebar.radio(
     "Select Module",
@@ -399,7 +399,7 @@ elif section == "AI Gene Prioritization":
     """, unsafe_allow_html=True)
 
     st.info(
-        
+        "Upload phenotype terms or explore unresolved case predictions."
     )
 
     if not pred_df.empty:
