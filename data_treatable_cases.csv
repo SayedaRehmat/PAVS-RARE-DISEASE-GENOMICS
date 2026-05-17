@@ -1,0 +1,23 @@
+gene_symbol,treatment,solved_status,n
+ACADM,Avoid fasting (MCAD),SOLVED,5
+ACADVL,Avoid fasting (VLCAD),IN_PROGRESS,1
+ACADVL,Avoid fasting (VLCAD),SOLVED,33
+ATP7B,Copper chelation (Wilson),SOLVED,42
+BTD,Biotin supplementation — URGENT,SOLVED,1
+CBS,Pyridoxine/Betaine (Homocystinuria),SOLVED,27
+G6PD,Avoid triggers,IN_PROGRESS,2
+G6PD,Avoid triggers,SOLVED,3
+GAA,Enzyme replacement (Pompe),SOLVED,24
+GAMT,Creatine + Ornithine,IN_PROGRESS,1
+GAMT,Creatine + Ornithine,SOLVED,5
+GJB2,Cochlear implant (early),IN_PROGRESS,1
+GJB2,Cochlear implant (early),SOLVED,6
+HLCS,Biotin supplementation,SOLVED,1
+PAH,BH4/Sapropterin (PKU),IN_PROGRESS,2
+PAH,BH4/Sapropterin (PKU),SOLVED,8
+PCCA,Protein restriction (PA),IN_PROGRESS,1
+PCCA,Protein restriction (PA),SOLVED,19
+PTS,BH4 therapy (HPA),IN_PROGRESS,1
+PTS,BH4 therapy (HPA),SOLVED,24
+SLC19A3,Biotin+Thiamine (BTBGD) — URGENT,IN_PROGRESS,1
+SLC19A3,Biotin+Thiamine (BTBGD) — URGENT,SOLVED,24

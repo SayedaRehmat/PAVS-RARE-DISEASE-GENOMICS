@@ -1,0 +1,101 @@
+case_id,gene_symbol,hgvs_p,vep_consequence,vep_impact,gnomad_pli,gene_solved_cases,priority,hpo_terms
+PAVS:M0000574,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration;HP:0001337|Tremor;HP:0001251|Ataxia;HP:0001288|Gait disturbance;HP:0001260|Dysarthria;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0000716|Depression;HP:0001332|Dystonia;HP:0100543|Cognitive impairment;HP:0000708|Atypical behavior
+PAVS:M0000573,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0100543|Cognitive impairment;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0001337|Tremor;HP:0000716|Depression;HP:0001251|Ataxia;HP:0001332|Dystonia;HP:0000708|Atypical behavior;HP:0001288|Gait disturbance;HP:0001260|Dysarthria
+PAVS:M0000575,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration;HP:0001337|Tremor;HP:0001251|Ataxia;HP:0001288|Gait disturbance;HP:0001260|Dysarthria;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0000716|Depression;HP:0001332|Dystonia;HP:0100543|Cognitive impairment;HP:0000708|Atypical behavior
+PAVS:M0000581,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration;HP:0001337|Tremor;HP:0001251|Ataxia;HP:0001288|Gait disturbance;HP:0001260|Dysarthria;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0000716|Depression;HP:0001332|Dystonia;HP:0100543|Cognitive impairment;HP:0000708|Atypical behavior
+PAVS:P0001251,ATP7B,ENSP00000242839.5:p.Ile1192SerfsTer27,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001396|Cholestasis
+PAVS:M0000577,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration;HP:0001337|Tremor;HP:0001251|Ataxia;HP:0001288|Gait disturbance;HP:0001260|Dysarthria;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0000716|Depression;HP:0001332|Dystonia;HP:0100543|Cognitive impairment;HP:0000708|Atypical behavior
+PAVS:M0000576,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration;HP:0001337|Tremor;HP:0001251|Ataxia;HP:0001288|Gait disturbance;HP:0001260|Dysarthria;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0000716|Depression;HP:0001332|Dystonia;HP:0100543|Cognitive impairment;HP:0000708|Atypical behavior
+PAVS:M0000571,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration
+PAVS:M0000572,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0100543|Cognitive impairment;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0001337|Tremor;HP:0000716|Depression;HP:0001251|Ataxia;HP:0001332|Dystonia;HP:0000708|Atypical behavior;HP:0001288|Gait disturbance;HP:0001260|Dysarthria
+PAVS:M0000557,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0200032|Kayser-Fleischer ring;HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration
+PAVS:M0000558,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0200032|Kayser-Fleischer ring;HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration;HP:0001337|Tremor;HP:0001251|Ataxia;HP:0001288|Gait disturbance;HP:0001260|Dysarthria;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0000716|Depression;HP:0001332|Dystonia;HP:0100543|Cognitive impairment;HP:0000708|Atypical behavior
+PAVS:M0000567,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0200122|Atypical or prolonged hepatitis;HP:0025321|Copper accumulation in liver;HP:0002240|Hepatomegaly;HP:0001394|Cirrhosis;HP:0001399|Hepatic failure;HP:0001259|Coma
+PAVS:M0000579,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration;HP:0001337|Tremor;HP:0001251|Ataxia;HP:0001288|Gait disturbance;HP:0001260|Dysarthria;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0000716|Depression;HP:0001332|Dystonia;HP:0100543|Cognitive impairment;HP:0000708|Atypical behavior
+PAVS:M0000568,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0200122|Atypical or prolonged hepatitis;HP:0025321|Copper accumulation in liver;HP:0002240|Hepatomegaly;HP:0001394|Cirrhosis;HP:0001399|Hepatic failure;HP:0001259|Coma
+PAVS:M0000559,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0200032|Kayser-Fleischer ring
+PAVS:M0000578,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration;HP:0001337|Tremor;HP:0001251|Ataxia;HP:0001288|Gait disturbance;HP:0001260|Dysarthria;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0000716|Depression;HP:0001332|Dystonia;HP:0100543|Cognitive impairment;HP:0000708|Atypical behavior
+PAVS:M0000569,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration
+PAVS:M0000580,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration;HP:0001337|Tremor;HP:0001251|Ataxia;HP:0001288|Gait disturbance;HP:0001260|Dysarthria;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0000716|Depression;HP:0001332|Dystonia;HP:0100543|Cognitive impairment;HP:0000708|Atypical behavior
+PAVS:M0000566,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0200122|Atypical or prolonged hepatitis;HP:0025321|Copper accumulation in liver;HP:0002240|Hepatomegaly;HP:0001394|Cirrhosis;HP:0001399|Hepatic failure;HP:0001259|Coma
+PAVS:M0000551,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001394|Cirrhosis
+PAVS:M0000552,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001394|Cirrhosis
+PAVS:M0000553,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0100543|Cognitive impairment;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0001337|Tremor;HP:0000716|Depression;HP:0001251|Ataxia;HP:0001332|Dystonia;HP:0000708|Atypical behavior;HP:0001288|Gait disturbance;HP:0001260|Dysarthria
+PAVS:M0000570,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration
+PAVS:M0000555,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0100543|Cognitive impairment;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0001337|Tremor;HP:0000716|Depression;HP:0001251|Ataxia;HP:0001332|Dystonia;HP:0000708|Atypical behavior;HP:0001288|Gait disturbance;HP:0001260|Dysarthria
+PAVS:M0000550,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001394|Cirrhosis
+PAVS:M0000554,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0100543|Cognitive impairment;HP:0002312|Clumsiness;HP:0000739|Anxiety;HP:0001337|Tremor;HP:0000716|Depression;HP:0001251|Ataxia;HP:0001332|Dystonia;HP:0000708|Atypical behavior;HP:0001288|Gait disturbance;HP:0001260|Dysarthria
+PAVS:M0000556,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001392|Abnormality of the liver;HP:0002910|Elevated circulating hepatic transaminase concentration
+PAVS:M0000549,ATP7B,ENSP00000242839.5:p.Gln1399ArgfsTer6,frameshift_variant,HIGH,1.0828e-35,42,40.2,HP:0001394|Cirrhosis
+PAVS:M0000392,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000393,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000394,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000397,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000396,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000402,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000401,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000400,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000383,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001644|Dilated cardiomyopathy
+PAVS:M0000399,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000398,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000444,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy;HP:0001511|Intrauterine growth retardation;HP:0001698|Pericardial effusion
+PAVS:M0000409,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000410,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000411,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000404,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000405,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000406,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000407,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000408,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000445,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:A0000126,ELAC2,ENSP00000337445.4:p.Gly227Val,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001943|Hypoglycemia;HP:0002014|Diarrhea;HP:0002910|Elevated circulating hepatic transaminase concentration;HP:0011398|obsolete Central hypotonia;HP:0001250|Seizure;HP:0001263|Global developmental delay;HP:0002788|Recurrent upper respiratory tract infections;HP:0002134|Abnormal basal ganglia morphology;HP:0003128|Lactic acidosis;HP:0006543|Cardiorespiratory arrest;HP:0001252|Hypotonia
+PAVS:M0000413,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000435,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000440,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001644|Dilated cardiomyopathy
+PAVS:M0000441,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:B0000031,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000412,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000437,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001698|Pericardial effusion;HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000442,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001698|Pericardial effusion;HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000433,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001698|Pericardial effusion;HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000432,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001263|Global developmental delay;HP:0001250|Seizure;HP:0001644|Dilated cardiomyopathy
+PAVS:M0000431,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001644|Dilated cardiomyopathy
+PAVS:M0000391,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000389,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001644|Dilated cardiomyopathy
+PAVS:M0000390,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001644|Dilated cardiomyopathy
+PAVS:M0000388,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001644|Dilated cardiomyopathy
+PAVS:M0000384,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001644|Dilated cardiomyopathy
+PAVS:M0000403,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000395,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000385,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001644|Dilated cardiomyopathy
+PAVS:M0000386,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001644|Dilated cardiomyopathy
+PAVS:M0000387,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001644|Dilated cardiomyopathy
+PAVS:M0000436,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000438,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000434,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000443,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001698|Pericardial effusion;HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000439,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001698|Pericardial effusion;HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000430,ELAC2,ENSP00000337445.4:p.Phe154Leu,missense_variant,MODERATE,2.8305e-27,50,40.0,HP:0001639|Hypertrophic cardiomyopathy
+PAVS:M0000142,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0001583|Rotatory nystagmus;HP:0007843|vascular attenuation;HP:0000577|Exotropia
+PAVS:M0000134,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0001583|MicroRotatory nystagmus;HP:0000543|rosy pale discs;HP:0007843|vascular attenuation
+PAVS:M0000138,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0001583|Rotatory nystagmus;HP:0007843|vessel attenuation
+PAVS:M0000140,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0001583|Rotatory nystagmus;HP:0007843|vessel attenuation
+PAVS:M0000139,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0001583|Rotatory nystagmus;HP:0007843|vessel attenuation;HP:0011503|Aplasia of the fovea
+PAVS:M0000126,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0000639|Nystagmus;HP:0000505|poor vision to CF OU;HP:0007843|vessels mildly attenuated;HP:0000980|Pallor
+PAVS:M0000146,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0001583|MicroRotatory nystagmus
+PAVS:M0000145,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0001583|MicroRotatory nystagmus;HP:0007843|vascular attenuation;HP:0100832|Vitreous floaters;HP:0000540|Hypermetropia
+PAVS:M0000144,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0001583|Rotatory nystagmus;HP:0007843|vascular attenuation;HP:0007737|Bone spicule pigmentation of the retina;HP:0030211|Slow pupillary light response
+PAVS:M0000141,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0001583|Rotatory nystagmus;HP:0000543|rosy pale discs;HP:0000510|peripheral retinitis pigmentosa
+PAVS:M0000143,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0001583|Rotatory nystagmus;HP:0007843|vascular attenuation
+PAVS:M0000103,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0007875|Congenital amaurosis
+PAVS:M0000116,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0000639|Unstable nystagmus;HP:0007737|Bone spicule pigmentation of the retina
+PAVS:M0000104,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0007875|Congenital amaurosis
+PAVS:M0000117,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0000639|nystagmus;HP:0007843|pallor vascular attenuation;HP:0000484|Hyperopic astigmatism
+PAVS:M0000123,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0000543|Small round pale discs;HP:0007843|Attenuation of retinal blood vessels;HP:0007737|Bone spicule pigmentation of the retina
+PAVS:M0000105,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0007875|Congenital amaurosis
+PAVS:M0000115,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0000505|Poor vision;HP:0000639|nystagmus;HP:0007843|vessel attenuation;HP:0034362|Dull foveal reflex;HP:0007894|Hypopigmentation of the fundus;HP:0000540|Hypermetropia;HP:0011512|Hyperpigmentation of the fundus;HP:0000580|Pigmentary retinopathy
+PAVS:M0000106,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0007875|Congenital amaurosis
+PAVS:M0000131,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0000666|Irregular horizontal nystagmus[Mild];HP:0000543|pale optic disc[Mild];HP:0034362|Dull foveal reflex[Mild];HP:0000540|Hypermetropia[Mild];HP:0002599|Head titubation[Mild]
+PAVS:M0000125,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0000980|Pallor;HP:0007843|Attenuation of retinal blood vessels
+PAVS:M0000132,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0008499|High hypermetropia
+PAVS:M0000137,TULP1,ENSP00000229771.6:p.Gln301Ter,stop_gained,HIGH,2.9584e-14,37,37.20000000000009,HP:0000640|minimal end-gaze nystagmus;HP:0000540|Hypermetropia;HP:0030506|Yellow/white lesions of the retina
