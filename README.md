@@ -1,245 +1,515 @@
-# Phenotype-Driven Gene Prioritization and Founder Mutation Landscape in Saudi Rare Disease Genomics
+# PAVS-RARE-DISEASE-GENOMICS
 
-**A computational analysis of the PAVS dataset — Pan-Arab Variant System**
-
----
-
-## Overview
-
-This repository contains the complete research pipeline, results, and interactive dashboard for a computational study of 7,510 rare disease cases from Saudi Arabia and the broader Arab world. The analysis characterises the population-specific autosomal recessive disease architecture, discovers Saudi founder mutation candidates, and develops an HPO-driven gene prioritization model that generates diagnostic predictions for unresolved patient cases.
-
-The study uses the PAVS dataset published by Abdelhakim et al. (medRxiv, 2026) and is submitted as part of a KAUST scholarship application targeting the Computational Bioscience Research Center (CBRC).
+## Population-Aware Rare Disease Genomics, Founder Variant Discovery, and Explainable Phenotype-Driven Gene Prioritization in Arab Cohorts
 
 ---
 
-## Dataset
+# Overview
 
-| Property | Value |
-|----------|-------|
-| Source | PAVS — Pan-Arab Variant System (Abdelhakim et al., medRxiv 2026) |
-| Total cases | 7,510 |
-| Solved cases | 4,391 (58.5%) |
-| Unique disease genes | 2,523 |
-| Unique diseases | 1,838 |
-| HPO annotations | 53,707 mentions · 24,446 unique terms |
-| Cohort sources | PAVS-Saudi (n=5,132) · DDD-UK (n=1,856) · PAVS-mixed (n=522) |
+Rare disease genomics remains strongly biased toward European population datasets, limiting diagnostic sensitivity and variant interpretation accuracy in underrepresented populations. This repository presents a large-scale computational analysis of the **PAVS (Pan-Arab Variant System)** cohort, integrating phenotype-driven analysis, founder mutation discovery, population architecture characterization, variant prioritization, and explainable machine learning for unresolved rare disease cases.
 
-The raw dataset file is at `data/PAVS_cases.tsv`.
+The project analyzes **7,510 clinically annotated rare disease cases** from Saudi Arabia and associated Arab cohorts using Human Phenotype Ontology (HPO) profiles, inheritance structure analysis, pathogenicity prioritization, and interpretable AI.
+
+This repository contains:
+
+* Full reproducible computational pipeline
+* Publication-style figures and analytical outputs
+* Population-scale founder mutation analysis
+* Explainable phenotype-driven gene prioritization
+* Treatable disease prioritization framework
+* Interactive Streamlit genomics dashboard
+* Structured result tables for downstream research
+* Research proposal and documentation
+
+The project was developed as an advanced computational genomics research portfolio focused on population-aware precision medicine and rare disease diagnostics.
 
 ---
 
-## Repository Structure
+# Scientific Motivation
 
+Global pathogenicity prediction systems and diagnostic pipelines are disproportionately trained on European-centric datasets. As a consequence:
+
+* Arab founder variants remain underrepresented
+* Autosomal recessive disease burden is underestimated
+* Variant interpretation pipelines generalize poorly to highly consanguineous populations
+* Many clinically relevant variants remain classified as VUS (Variant of Uncertain Significance)
+* Phenotype-driven prioritization systems fail to capture regional disease architecture
+
+Saudi Arabia and neighboring Arab populations exhibit one of the highest known burdens of recessive Mendelian disorders due to elevated consanguinity rates and founder effects.
+
+This project investigates:
+
+1. Population-specific rare disease architecture
+2. Founder mutation landscapes in Arab cohorts
+3. Phenotype similarity structure using HPO profiles
+4. AI-driven prioritization for unresolved cases
+5. Treatable disease identification opportunities
+6. Reclassification potential for uncertain variants
+
+---
+
+# Dataset
+
+## Source
+
+**PAVS — Pan-Arab Variant System**
+
+The dataset contains aggregated rare disease case information from Saudi and international cohorts with curated clinical phenotypes and variant annotations.
+
+---
+
+## Cohort Statistics
+
+| Metric                         | Value  |
+| ------------------------------ | ------ |
+| Total cases                    | 7,510  |
+| Solved cases                   | 4,391  |
+| Unresolved / in-progress cases | 3,119  |
+| Unique disease genes           | 2,523  |
+| Unique diseases                | 1,838  |
+| Unique HPO terms               | 24,446 |
+| Total HPO annotations          | 53,707 |
+| Saudi cohort size              | 5,132  |
+| DDD UK cohort                  | 1,856  |
+| Mixed cohort                   | 522    |
+
+---
+
+# Major Research Components
+
+## 1. Population Architecture Analysis
+
+The analysis demonstrates a striking enrichment of homozygous pathogenic variants within the Saudi cohort relative to the UK comparison cohort.
+
+### Key Observation
+
+| Cohort     | Homozygous Variant Rate |
+| ---------- | ----------------------- |
+| PAVS-Saudi | 52.2%                   |
+| DDD-UK     | 0%                      |
+
+This strongly reflects the recessive inheritance burden associated with population-specific founder effects and consanguinity.
+
+The project further characterizes:
+
+* inheritance structure differences
+* diagnostic yield differences
+* HPO burden distribution
+* disease diversity
+* cohort-level genomic architecture
+
+---
+
+## 2. Founder Mutation Discovery
+
+A dedicated founder analysis module identified:
+
+# 129 recurrent founder mutation candidates
+
+The recovered variants include multiple previously reported Arab founder mutations, providing biological and analytical validation.
+
+### Representative Founder Variants
+
+| Gene     | Disease Association                              | Cases |
+| -------- | ------------------------------------------------ | ----- |
+| ELAC2    | Mitochondrial disease                            | 47    |
+| ATP7B    | Wilson disease                                   | 42    |
+| TULP1    | Retinitis pigmentosa                             | 36    |
+| ADAT3    | Intellectual disability                          | 29    |
+| SLC19A3  | Biotin-thiamine-responsive basal ganglia disease | 22    |
+| TMC1     | Non-syndromic hearing loss                       | 22    |
+| C12ORF57 | Temtamy syndrome                                 | 19    |
+
+The founder prioritization framework integrates:
+
+* recurrence frequency
+* homozygosity patterns
+* population enrichment
+* gene-level disease burden
+* known founder annotations
+
+Outputs are available in:
+
+```text
+outputs/tables/data_founder_mutations.csv
 ```
-PAVS-RARE-DISEASE-GENOMICS/
+
+---
+
+## 3. Explainable Phenotype-Driven Gene Prioritization
+
+The repository implements an interpretable machine learning framework for unresolved rare disease cases.
+
+### Modeling Strategy
+
+* HPO term vectorization
+* MultiLabelBinarizer phenotype encoding
+* Random Forest classification
+* Cross-validation evaluation
+* Top-k gene ranking prediction
+
+The system predicts likely causal genes directly from patient phenotype profiles.
+
+### Model Characteristics
+
+| Component       | Details                            |
+| --------------- | ---------------------------------- |
+| Input           | HPO phenotype profiles             |
+| Model           | Random Forest classifier           |
+| Feature space   | Multi-hot HPO encoding             |
+| Training subset | Solved Saudi cases                 |
+| Explainability  | SHAP-compatible feature importance |
+| Output          | Top candidate disease genes        |
+
+### Generated Predictions
+
+The pipeline generated predictions for:
+
+# 1,522 unresolved patient cases
+
+Output file:
+
+```text
+outputs/tables/data_gene_predictions_unsolved.csv
+```
+
+---
+
+## 4. Variant Reclassification Prioritization
+
+The project identifies high-priority VUS candidates with strong evidence for pathogenic reevaluation.
+
+The prioritization combines:
+
+* predicted functional impact
+* gene intolerance metrics
+* phenotype relevance
+* solved-case enrichment
+* recurrence evidence
+
+### Output
+
+```text
+outputs/tables/data_VUS_reclassification.csv
+```
+
+This creates a scalable framework for future clinical reinterpretation workflows.
+
+---
+
+## 5. Treatable Rare Disease Discovery
+
+A clinically oriented module identifies potentially treatable unresolved cases.
+
+The pipeline cross-references:
+
+* disease-associated genes
+* therapeutic evidence
+* unresolved diagnostic cases
+* phenotype similarity
+
+### Example Treatable Conditions
+
+| Gene    | Therapeutic Context        |
+| ------- | -------------------------- |
+| PAH     | Sapropterin-responsive PKU |
+| G6PD    | Trigger avoidance          |
+| ATP7B   | Copper chelation           |
+| SLC19A3 | Biotin + thiamine therapy  |
+
+Output tables:
+
+```text
+outputs/tables/data_treatable_cases.csv
+outputs/tables/data_treatable_unsolved.csv
+```
+
+---
+
+## 6. Disease Similarity and HPO Network Analysis
+
+The project constructs phenotype similarity structures across rare diseases using HPO overlap analysis.
+
+Analytical modules include:
+
+* HPO co-occurrence mapping
+* disease similarity matrices
+* clustering relationships
+* phenotype burden analysis
+* neurological disease enrichment
+
+Generated outputs include:
+
+```text
+outputs/tables/data_hpo_cooccurrence.csv
+outputs/tables/data_disease_hpo_similarity.csv
+```
+
+---
+
+# Repository Structure
+
+```text
+
+│
+├── app.py
+├── README.md
+├── requirements.txt
+├── 
 │
 ├── data/
-│   └── PAVS_cases.tsv                    Raw dataset — 7,510 cases, 31 features
+│   └── PAVS_cases.tsv
 │
 ├── src/
-│   ├── analysis.py                        Complete 13-module analysis pipeline
-│   └── generate_proposal.py               PDF research proposal generator
+│   ├── analysis.py
+│   └── 
 │
 ├── outputs/
-│   ├── figures/                           16 publication-quality figures (fig00–fig15)
-│   └── tables/                            8 result CSV files
+│   ├── figures/
+│   │   ├── fig00_FINAL_DASHBOARD.png
+│   │   ├── fig02_genes_diseases.png
+│   │   ├── fig04_top_hpo_terms.png
+│   │   ├── fig05_population_comparison.png
+│   │   ├── fig07_AR_architecture.png
+│   │   ├── fig08_treatable_diseases.png
+│   │   ├── fig09_neuro_burden.png
+│   │   ├── fig10_disease_similarity.png
+│   │   ├── fig12_tsne.png
+│   │   └── fig13_pathogenicity_PR.png
+│   │
+│   └── tables/
+│       ├── data_founder_mutations.csv
+│       ├── data_gene_predictions_unsolved.csv
+│       ├── data_population_comparison.csv
+│       ├── data_VUS_reclassification.csv
+│       ├── data_treatable_cases.csv
+│       ├── data_treatable_unsolved.csv
+│       ├── data_hpo_cooccurrence.csv
+│       └── data_disease_hpo_similarity.csv
 │
-├── docs/
-│   └── PAVS_Research_Proposal_Sayeda_Rehmat.pdf    Full research proposal
-│
-├── app.py                                 Interactive Streamlit dashboard
-├── requirements.txt                       Python dependencies
-└── README.md                              This file
+└── 
+    
 ```
 
 ---
 
-## How to Run
+# Analytical Pipeline
 
-### Step 1 — Install dependencies
+The end-to-end workflow includes:
 
-```bash
-pip install -r requirements.txt
-```
+1. Data ingestion and preprocessing
+2. HPO normalization and parsing
+3. Cohort stratification
+4. Founder variant recurrence analysis
+5. Population comparison analysis
+6. Disease burden quantification
+7. HPO network construction
+8. Treatable disease prioritization
+9. Variant pathogenicity prioritization
+10. Machine learning model training
+11. Unresolved case prediction
+12. Visualization generation
+13. Interactive dashboard deployment
 
-### Step 2 — Run the full analysis
+---
 
-```bash
-python3 src/analysis.py
-```
+# Interactive Dashboard
 
-This runs all 13 analytical modules and writes 16 figures and 8 CSV tables into `outputs/`.
+The repository includes a fully interactive Streamlit dashboard for exploration of:
 
-Expected runtime: 8–15 minutes depending on hardware (t-SNE and cross-validation are the slow steps).
+* cohort statistics
+* founder mutations
+* phenotype architecture
+* disease distributions
+* AI prediction outputs
+* treatable diseases
+* variant prioritization
+* visual analytics
 
-### Step 3 — Launch the interactive dashboard
+Launch locally:
 
 ```bash
 streamlit run app.py
 ```
 
-Open `http://localhost:8501` in your browser.
+---
 
-### Step 4 — Generate the PDF research proposal
+# Installation
+
+## Clone Repository
 
 ```bash
-python3 src/generate_proposal.py
+git clone <repository-url>
+cd PAVS_GITHUB
 ```
 
 ---
 
-## Key Findings
+## Install Dependencies
 
-### Population Architecture
-
-Saudi PAVS cohort shows 52.2% homozygous variants compared to 0% in the DDD-UK cohort. This directly reflects Saudi Arabia's consanguineous marriage structure and is consistent with Al-Sayed et al. (Genetics in Medicine, 2017), who reported that 97% of solved cases in Saudi exome cohorts carry homozygous recessive mutations.
-
-### Saudi Founder Mutations
-
-129 recurrent variant candidates identified in the Saudi-only subset. All major published Arab founders were independently recovered, providing analytical validation:
-
-| Gene | Cases | Disease | Status |
-|------|-------|---------|--------|
-| ELAC2 | 51 | Mitochondrial disease | Confirmed Saudi founder |
-| ATP7B | 42 | Wilson disease | Confirmed, treatable |
-| TULP1 | 38 | Retinitis pigmentosa | Confirmed Arab founder |
-| ADAT3 | 29 | Autosomal recessive intellectual disability | Confirmed pan-Arab founder |
-| SLC19A3 | 22 | BTBGD | Confirmed, treatable — urgent |
-| TMC1 | 22 | Non-syndromic hearing loss | Confirmed Saudi founder |
-| C12ORF57 | 19 | Temtamy syndrome | Confirmed Arab founder |
-
-### Gene Prioritization Model
-
-A Random Forest classifier trained on MultiLabelBinarized HPO term vectors (Saudi cohort only, 77 gene classes, 1,180 training samples):
-
-| Metric | Value |
-|--------|-------|
-| 5-fold CV accuracy | 46.4% ± 1.7% |
-| Top-1 accuracy | 89.4% |
-| Top-3 accuracy | 98.5% |
-| Top-5 accuracy | 100% |
-| Random baseline | 1.3% (1/77) |
-| Improvement over chance | 36× |
-| Unsolved cases predicted | 1,522 patients |
-
-Top-3 accuracy of 98.5% means the true causal gene appears in the model's top 3 suggestions for 9.85 out of 10 patients — the standard clinical threshold for gene prioritization tools.
-
-### Pathogenicity Classification
-
-Binary classifier (Pathogenic/LP vs VUS) on 5,988 ACMG-annotated cases:
-
-| Metric | Value |
-|--------|-------|
-| AUC-ROC (5-fold CV) | 0.670 ± 0.069 |
-| Average Precision | 0.791 |
-| Random AP baseline | 0.018 |
-| Improvement over baseline | 44× |
-
-Average Precision is the correct metric given the 98:2 class imbalance (5,880 VUS vs 108 P/LP). The AUC of 0.67 is consistent with published benchmarks on equivalent real-world clinical data (Nicora et al., Sci. Reports 2022: 0.65–0.75).
-
-### Treatable Disease Cases
-
-10 unresolved patients identified with variants in genes carrying available, potentially life-saving treatments. SLC19A3 (biotin+thiamine supplementation for BTBGD) and GAA (enzyme replacement therapy for Pompe disease) represent the highest clinical urgency.
-
-### Neurodevelopmental Burden
-
-3,385 cases (45.1%) involve neurodevelopmental phenotypes. The dominant causal genes — ADAT3, ISCA2, C12ORF57, FBXL4 — are all Saudi or Arab founder variants, confirming the population-specific architecture of this disease category.
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
-## Output Files
+# Running the Analysis
 
-### Figures (`outputs/figures/`)
+## Execute Full Pipeline
 
-| File | Description |
-|------|-------------|
-| fig00_FINAL_DASHBOARD.png | Summary dashboard — all key findings |
-| fig01_cohort_overview.png | Case status, source, ACMG, HPO distribution |
-| fig02_genes_diseases.png | Top 20 genes and top 15 diseases |
-| fig03_variant_landscape.png | VEP consequence types and zygosity |
-| fig04_top_hpo_terms.png | Top 30 HPO phenotypes |
-| fig05_population_comparison.png | Saudi vs DDD-UK vs mixed cohort comparison |
-| fig06_founder_mutations.png | Saudi founder mutation candidates |
-| fig07_AR_architecture.png | Autosomal recessive zygosity architecture |
-| fig08_treatable_diseases.png | Treatable disease case breakdown |
-| fig09_neuro_burden.png | Neurodevelopmental disease burden |
-| fig10_disease_similarity.png | Disease phenotype similarity heatmap (Jaccard) |
-| fig11_gene_model.png | Gene model performance and feature importance |
-| fig12_tsne.png | t-SNE HPO phenotype space |
-| fig13_pathogenicity_PR.png | Precision-recall curve for pathogenicity classifier |
-| fig14_hpo_cooccurrence.png | HPO term co-occurrence matrix |
-| fig15_ADAT3_deepdive.png | ADAT3 founder mutation deep dive |
+```bash
+python src/analysis.py
+```
 
-### Tables (`outputs/tables/`)
+The pipeline automatically:
 
-| File | Description |
-|------|-------------|
-| data_gene_predictions_unsolved.csv | Top-3 gene predictions for 1,522 unsolved patients |
-| data_founder_mutations.csv | 129 Saudi founder mutation candidates |
-| data_treatable_unsolved.csv | Unsolved cases with available treatments |
-| data_VUS_reclassification.csv | 1,105 VUS priority reclassification candidates |
-| data_disease_hpo_similarity.csv | Jaccard similarity matrix across 22 diseases |
-| data_founder_mutations.csv | Full recurrence analysis table |
-| data_population_comparison.csv | Source stratification statistics |
-| data_treatable_cases.csv | All treatable gene case breakdown |
+* processes all cases
+* generates figures
+* exports result tables
+* trains the prioritization model
+* performs founder analysis
+* creates downstream outputs
 
 ---
 
-## Analytical Methods
+# Core Outputs
 
-| Module | Method | Tool |
-|--------|--------|------|
-| Population stratification | Cohort source comparison | pandas |
-| Founder mutation discovery | Variant recurrence analysis (≥3 cases, Saudi-only) | pandas, groupby |
-| AR architecture | Zygosity profiling by source | pandas, seaborn |
-| Treatable disease mining | Gene-treatment mapping | Custom annotation |
-| Neurodevelopmental profiling | HPO subset analysis | pandas |
-| Disease similarity | Jaccard index on HPO term sets | numpy |
-| Gene prioritization | Random Forest, MultiLabelBinarizer HPO features | scikit-learn |
-| Dimensionality reduction | PCA + t-SNE on HPO feature matrix | scikit-learn |
-| Pathogenicity classification | Random Forest, balanced class weights | scikit-learn |
-| VUS reclassification | Priority scoring (gene confidence + VEP + pLI) | pandas |
-| HPO co-occurrence | Term-term co-occurrence matrix | numpy |
+## Figures
 
----
+The analysis generates publication-style visualizations including:
 
-## Validation Against Published Literature
-
-Every major finding is cross-validated against peer-reviewed publications:
-
-| Finding | This Study | Literature |
-|---------|-----------|------------|
-| Saudi homozygosity | 52.2% | "97% of solved Saudi cases are homozygous" — Al-Sayed et al. 2017 |
-| ADAT3 | 29 cases, 100% hom | Confirmed pan-Arab founder — Alazami et al. 2013 |
-| SLC19A3 | 22 cases, homozygous | Confirmed Saudi BTBGD founder — Algahtani et al. 2016 |
-| ELAC2 frequency | 51 cases, most frequent | Major Saudi mitochondrial founder — Akawi et al. 2016 |
-| Neuro burden | 45.1% of cohort | "Most common category in consanguineous Arab cohorts" — Alkuraya 2022 |
-| VUS classifier AUC | 0.67 | AUC 0.65–0.75 on equivalent data — Nicora et al. 2022 |
-| Gene model Top-K | Top-3 = 98.5% | GPT-4 Top-1 = 30–44% on same task — Kim et al. 2024 |
+* cohort architecture
+* disease distributions
+* founder burden
+* HPO landscape
+* t-SNE embeddings
+* neurological burden analysis
+* phenotype similarity structure
+* pathogenicity prioritization performance
 
 ---
 
-## References
+## Tables
 
-1. Abdelhakim M et al. (2026). PAVS: Pan-Arab Variant System. *medRxiv*. doi:10.64898/2026.04.05.26350189
-2. Kim J et al. (2024). Utility of LLMs for phenotype-driven gene prioritization. *Am J Hum Genet*, 111(10):2190–2202.
-3. Zhao M et al. (2020). Phen2Gene: rapid phenotype-driven gene prioritization. *NAR Genomics & Bioinformatics*, 2(2):lqaa032.
-4. Nicora G et al. (2022). ML approach based on ACMG/AMP for variant classification. *Scientific Reports*.
-5. Al-Sayed MD et al. (2017). Multicenter clinical exome in consanguineous Saudi population. *Genetics in Medicine*, 19(7):769–776.
-6. Alkuraya FS (2022). Common disease-associated gene variants in Saudi Arabia. *Ann Saudi Med*, 42(1):29–33.
-7. Alazami AM et al. (2013). ADAT3 mutated in autosomal recessive intellectual disability. *Open Biology*, 3(11):130121.
-8. Karthik S et al. (2025). Hypergraph approach to phenotype-driven gene prioritization. *Scientific Reports*, 15:23780.
+Structured result tables are exported in CSV format for reproducibility and downstream analysis.
 
 ---
 
-## KAUST Research Alignment
+# Computational Stack
 
-This project targets the **Computational Bioscience Research Center (CBRC)** at KAUST, specifically:
+## Languages and Frameworks
 
-- **Prof. Robert Hoehndorf** — Bio-Ontology Research Group — HPO-based gene-disease ML
-- **Prof. Xin Gao** — Structural and Functional Bioinformatics — AI for genomics
-- **Saudi Vision 2030** — precision medicine and population genomics infrastructure
+* Python
+* Pandas
+* NumPy
+* Scikit-learn
+* Matplotlib
+* Seaborn
+* Streamlit
+
+## Machine Learning
+
+* Random Forest classification
+* Phenotype vectorization
+* Cross-validation evaluation
+* Explainable prioritization
+
+## Genomics Concepts
+
+* Human Phenotype Ontology (HPO)
+* Founder mutation analysis
+* Rare disease genomics
+* Variant prioritization
+* Population genomics
+* Mendelian inheritance analysis
 
 ---
 
-*Sayeda Rehmat · KAUST Scholarship Application 2026*
+# Scientific Significance
+
+This repository demonstrates how population-aware computational genomics can improve interpretation of rare disease datasets from historically underrepresented populations.
+
+The project contributes:
+
+* scalable phenotype-driven analysis
+* founder variant discovery workflows
+* interpretable AI prioritization
+* clinically relevant treatable disease discovery
+* Arab population rare disease characterization
+* reproducible precision medicine analytics
+
+The framework is extensible to:
+
+* whole genome sequencing cohorts
+* clinical diagnostic pipelines
+* federated genomic studies
+* multi-omics integration
+* graph-based phenotype learning
+* large-scale pathogenicity prediction systems
+
+---
+
+# Limitations
+
+The current repository represents a computational research framework and not a validated clinical diagnostic system.
+
+Important limitations include:
+
+* dependence on available phenotype annotations
+* limited external validation cohorts
+* absence of functional validation
+* cohort imbalance across populations
+* simplified ML architecture relative to production clinical systems
+* incomplete variant-level experimental evidence
+
+The repository is intended for research and educational purposes.
+
+---
+
+# Future Directions
+
+Planned extensions include:
+
+* graph neural networks for phenotype reasoning
+* protein language model integration
+* ClinVar/gnomAD dynamic synchronization
+* automated ACMG evidence scoring
+* pathway enrichment analysis
+* network medicine integration
+* multi-omics disease subtyping
+* federated Arab genomics framework
+* explainable deep learning architectures
+
+---
+
+# Author
+
+**Sayeda Rehmat**
+
+Computational genomics and AI-driven precision medicine research portfolio focused on rare disease interpretation, population genomics, and phenotype-aware machine learning.
+
+---
+
+# Citation
+
+If this repository contributes to your research or educational work, please cite the project appropriately.
+
+---
+
+# License
+
+This repository is distributed for research and educational purposes.
+
+Please ensure appropriate citation and compliance with the original PAVS dataset usage terms.
+
+---
+
+# Acknowledgments
+
+* PAVS consortium and contributing researchers
+* Human Phenotype Ontology initiative
+* Rare disease genomics community
+* Open-source scientific Python ecosystem
+
+---
+
