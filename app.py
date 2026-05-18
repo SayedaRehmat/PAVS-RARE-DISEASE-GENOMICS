@@ -1,4 +1,4 @@
-```python
+
 # =========================================================
 # PAVS RARE DISEASE GENOMICS PLATFORM
 # Elite Interactive Streamlit Dashboard
