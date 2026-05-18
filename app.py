@@ -708,14 +708,3 @@ Sayeda Rehmat · Computational Genomics Research Portfolio
 </div>
 """, unsafe_allow_html=True)
 
-```
-
-# requirements.txt
-
-```text
-streamlit
-pandas
-numpy
-plotly
-pillow
-```
