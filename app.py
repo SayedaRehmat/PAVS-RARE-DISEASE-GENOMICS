@@ -118,6 +118,84 @@ T = THEMES[theme_mode]
 st.markdown(f"""
 <style>
 
+/* ===== VISIBILITY + LIGHT THEME FIXES ===== */
+
+html, body, .stApp {
+    color: var(--text) !important;
+}
+
+p, span, label, div {
+    color: var(--text);
+}
+
+[data-testid="stSidebar"] * {
+    color: var(--text) !important;
+}
+
+.stMarkdown,
+.stText,
+.stCaption,
+.stMetric,
+.stDataFrame,
+.stTable {
+    color: var(--text) !important;
+}
+
+/* INPUTS */
+
+.stTextInput input,
+.stTextArea textarea,
+.stSelectbox div[data-baseweb="select"],
+.stMultiSelect div[data-baseweb="select"] {
+    background-color: var(--card2) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+}
+
+/* LABELS */
+
+.stRadio label,
+.stSelectbox label,
+.stSlider label,
+.stTextInput label,
+.stTextArea label {
+    color: var(--text) !important;
+    font-weight: 500;
+}
+
+/* DATAFRAMES */
+
+[data-testid="stDataFrame"] {
+    background-color: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 18px;
+}
+
+/* METRICS */
+
+[data-testid="metric-container"] {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1rem;
+}
+
+/* BUTTONS */
+
+.stButton button {
+    background: linear-gradient(135deg, var(--green), var(--blue));
+    color: white !important;
+    border: none;
+    border-radius: 12px;
+    padding: .6rem 1.2rem;
+    font-weight: 600;
+}
+
+.stButton button:hover {
+    opacity: .92;
+}
+
+
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@300;400;500;700&family=Sora:wght@300;400;500;600&display=swap');
 
 :root {{
@@ -708,3 +786,6 @@ Sayeda Rehmat · Computational Genomics Research Portfolio
 </div>
 """, unsafe_allow_html=True)
 
+ 
+pillow
+```
