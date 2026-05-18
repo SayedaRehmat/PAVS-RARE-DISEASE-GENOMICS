@@ -787,5 +787,3 @@ Sayeda Rehmat · Computational Genomics Research Portfolio
 """, unsafe_allow_html=True)
 
  
-pillow
-```
