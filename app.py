@@ -1,138 +1,50 @@
-
-import os
-import warnings
-warnings.filterwarnings("ignore")
+# =====================================================================================
+# app.py
+# PAVS Rare Disease Genomics Platform
+# Professional Interactive Streamlit Dashboard
+# Auto-Compatible with Light + Dark Themes
+# =====================================================================================
 
 import streamlit as st
 import pandas as pd
 import numpy as np
+from pathlib import Path
+from PIL import Image
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
-import altair as alt
-import networkx as nx
-from sklearn.preprocessing import MultiLabelBinarizer
 
-# =========================================================
+# =====================================================================================
 # PAGE CONFIG
-# =========================================================
+# =====================================================================================
+
 st.set_page_config(
-    page_title="PAVS Genomics Intelligence Platform",
+    page_title="PAVS Rare Disease Genomics",
     page_icon="🧬",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# =========================================================
-# THEME ENGINE
-# =========================================================
-THEME = st.get_option("theme.base")
-
-if THEME == "dark":
-    BG = "#0f172a"
-    CARD = "#111827"
-    TEXT = "#f9fafb"
-    MUTED = "#9ca3af"
-    BORDER = "#374151"
-else:
-    BG = "#ffffff"
-    CARD = "#f8fafc"
-    TEXT = "#0f172a"
-    MUTED = "#475569"
-    BORDER = "#dbeafe"
-
-# =========================================================
-# GLOBAL STYLE
-# =========================================================
-st.markdown(f"""
-<style>
-html, body, [class*="css"] {{
-    color: {TEXT};
-}}
-
-.main {{
-    background-color: {BG};
-}}
-
-.block-container {{
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-}}
-
-.metric-card {{
-    background: {CARD};
-    border: 1px solid {BORDER};
-    padding: 1.3rem;
-    border-radius: 22px;
-    transition: 0.3s;
-}}
-
-.metric-card:hover {{
-    transform: translateY(-3px);
-}}
-
-.metric-title {{
-    font-size: 0.95rem;
-    color: {MUTED};
-    font-weight: 600;
-}}
-
-.metric-value {{
-    font-size: 2rem;
-    font-weight: 800;
-    color: {TEXT};
-}}
-
-.hero-title {{
-    font-size: 3rem;
-    font-weight: 900;
-    line-height: 1.1;
-    margin-bottom: 0.5rem;
-}}
-
-.hero-sub {{
-    font-size: 1.1rem;
-    color: {MUTED};
-    line-height: 1.7;
-}}
-
-.section-title {{
-    font-size: 2rem;
-    font-weight: 800;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-}}
-</style>
-""", unsafe_allow_html=True)
-
-# =========================================================
+# =====================================================================================
 # PATHS
-# =========================================================
-BASE_DIR = "."
-DATA_DIR = os.path.join(BASE_DIR, "data")
-OUTPUT_DIR = os.path.join(BASE_DIR, "outputs")
+# =====================================================================================
 
-MAIN_DATA = os.path.join(DATA_DIR, "PAVS_cases.tsv")
-FOUNDERS_FILE = os.path.join(OUTPUT_DIR, "data_founder_mutations.csv")
-PRED_FILE = os.path.join(OUTPUT_DIR, "data_gene_predictions_unsolved.csv")
-SIM_FILE = os.path.join(OUTPUT_DIR, "data_disease_hpo_similarity.csv")
-TREATABLE_FILE = os.path.join(OUTPUT_DIR, "data_treatable_cases.csv")
-VUS_FILE = os.path.join(OUTPUT_DIR, "data_VUS_reclassification.csv")
-HPO_COOCCUR = os.path.join(OUTPUT_DIR, "data_hpo_cooccurrence.csv")
+BASE_DIR = Path(".")
+DATA_PATH = BASE_DIR / "data" / "PAVS_cases.tsv"
+OUTPUT_DIR = BASE_DIR / "outputs"
 
-# =========================================================
-# LOADERS
-# =========================================================
+# =====================================================================================
+# LOAD DATA
+# =====================================================================================
+
 @st.cache_data
-
-def load_main():
-    df = pd.read_csv(MAIN_DATA, sep="	")
+def load_main_data():
+    df = pd.read_csv(DATA_PATH, sep="\t")
 
     df["is_solved"] = df["solved_status"] == "SOLVED"
-    df["is_homozygous"] = df["zygosity_label"] == "homozygous"
 
     df["hpo_list"] = df["hpo_terms"].fillna("").apply(
-        lambda s: [x.split("|")[0].strip() for x in s.split(";") if x]
+        lambda x: [i.split("|")[0] for i in x.split(";") if i]
     )
 
     df["hpo_count"] = df["hpo_list"].apply(len)
@@ -141,541 +53,518 @@ def load_main():
 
 
 @st.cache_data
-
-def load_csv(path):
-    if os.path.exists(path):
+def load_csv(name):
+    path = OUTPUT_DIR / name
+    if path.exists():
         return pd.read_csv(path)
     return pd.DataFrame()
 
 
-@st.cache_data
+df = load_main_data()
 
-def load_similarity():
-    if os.path.exists(SIM_FILE):
-        return pd.read_csv(SIM_FILE, index_col=0)
-    return pd.DataFrame()
+# =====================================================================================
+# GLOBAL METRICS
+# =====================================================================================
 
+TOTAL_CASES = len(df)
+TOTAL_GENES = df["gene_symbol"].nunique()
+TOTAL_DISEASES = df["disease_label"].nunique()
+SOLVED_CASES = int(df["is_solved"].sum())
+UNSOLVED = TOTAL_CASES - SOLVED_CASES
+NEURO_CASES = int(df["hpo_terms"].str.contains("HP:0001249", na=False).sum())
 
-@st.cache_data
+# =====================================================================================
+# THEME-SAFE CSS
+# =====================================================================================
 
-def load_hpo_matrix():
-    if os.path.exists(HPO_COOCCUR):
-        return pd.read_csv(HPO_COOCCUR, index_col=0)
-    return pd.DataFrame()
+st.markdown("""
+<style>
 
+/* Main background */
+.stApp {
+    background-color: transparent;
+}
 
-# =========================================================
-# DATA
-# =========================================================
-df = load_main()
-founders_df = load_csv(FOUNDERS_FILE)
-pred_df = load_csv(PRED_FILE)
-treat_df = load_csv(TREATABLE_FILE)
-vus_df = load_csv(VUS_FILE)
-sim_df = load_similarity()
-hpo_matrix = load_hpo_matrix()
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    border-right: 1px solid rgba(120,120,120,0.15);
+}
 
-# =========================================================
+/* Metric Cards */
+.metric-card {
+    border-radius: 22px;
+    padding: 1.3rem;
+    background: rgba(120,120,120,0.08);
+    border: 1px solid rgba(120,120,120,0.15);
+    backdrop-filter: blur(10px);
+}
+
+.metric-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Hero */
+.hero {
+    padding: 2.5rem;
+    border-radius: 28px;
+    background: linear-gradient(
+        135deg,
+        rgba(0,201,167,0.10),
+        rgba(79,142,247,0.08)
+    );
+    border: 1px solid rgba(120,120,120,0.12);
+    margin-bottom: 2rem;
+}
+
+.hero-title {
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 0.8rem;
+}
+
+.hero-sub {
+    font-size: 1.05rem;
+    opacity: 0.8;
+    line-height: 1.7;
+    max-width: 1000px;
+}
+
+/* Section title */
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* Tables */
+[data-testid="stDataFrame"] {
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =====================================================================================
 # SIDEBAR
-# =========================================================
+# =====================================================================================
+
 st.sidebar.title("🧬 PAVS Platform")
 
-page = st.sidebar.radio(
+section = st.sidebar.radio(
     "Navigation",
     [
-        "Landing Page",
+        "Overview",
         "Cohort Analytics",
-        "Founder Intelligence",
-        "AI Gene Prioritization",
-        "HPO Intelligence",
-        "Disease Similarity",
+        "Population Genomics",
+        "Founder Mutations",
         "Treatable Diseases",
-        "Figure Explorer"
+        "Neurodevelopmental Burden",
+        "Disease Similarity",
+        "AI Gene Prioritization",
+        "Pathogenicity Intelligence",
+        "VUS Reclassification",
+        "HPO Architecture",
+        "ADAT3 Deep Dive",
+        "Figure Explorer",
+        "Research Summary"
     ]
 )
 
 st.sidebar.markdown("---")
 
-sources = st.sidebar.multiselect(
-    "Source Filter",
-    sorted(df["source"].dropna().unique()),
-    default=sorted(df["source"].dropna().unique())
-)
+st.sidebar.metric("Patient Cases", f"{TOTAL_CASES:,}")
+st.sidebar.metric("Disease Genes", f"{TOTAL_GENES:,}")
+st.sidebar.metric("Rare Diseases", f"{TOTAL_DISEASES:,}")
+st.sidebar.metric("Solved Cases", f"{SOLVED_CASES:,}")
 
-statuses = st.sidebar.multiselect(
-    "Status Filter",
-    sorted(df["solved_status"].dropna().unique()),
-    default=sorted(df["solved_status"].dropna().unique())
-)
+# =====================================================================================
+# OVERVIEW
+# =====================================================================================
 
-filtered_df = df[
-    (df["source"].isin(sources)) &
-    (df["solved_status"].isin(statuses))
-]
+if section == "Overview":
 
-# =========================================================
-# LANDING PAGE
-# =========================================================
-if page == "Landing Page":
-
-    st.markdown(
-        f'''
+    st.markdown("""
+    <div class="hero">
         <div class="hero-title">
-        PAVS Rare Disease Genomics Intelligence Platform
+            Rare Disease Genomics<br>
+            in the Arab World
         </div>
 
         <div class="hero-sub">
-        AI-driven translational genomics platform integrating founder mutation discovery,
-        HPO phenotype informatics, Saudi population genomics, disease similarity analysis,
-        and precision medicine intelligence.
+            A computational genomics intelligence platform analyzing 7,510 Saudi
+            rare disease cases using founder mutation discovery, HPO-driven AI
+            prioritization, phenotype architecture analysis, and translational
+            precision medicine analytics.
         </div>
-        ''',
-        unsafe_allow_html=True
-    )
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown("---")
-
-    c1, c2, c3, c4 = st.columns(4)
-
-    metrics = [
-        ("Total Cases", f"{len(df):,}"),
-        ("Unique Genes", f"{df['gene_symbol'].nunique():,}"),
-        ("Solved Cases", f"{df['is_solved'].sum():,}"),
-        ("Homozygous %", f"{df['is_homozygous'].mean()*100:.1f}%")
-    ]
-
-    for col, metric in zip([c1,c2,c3,c4], metrics):
-        with col:
-            st.markdown(
-                f'''
-                <div class="metric-card">
-                <div class="metric-title">{metric[0]}</div>
-                <div class="metric-value">{metric[1]}</div>
-                </div>
-                ''',
-                unsafe_allow_html=True
-            )
-
-    st.markdown("---")
-
-    left, right = st.columns([1.1,1])
-
-    with left:
-        src = filtered_df["source"].value_counts().reset_index()
-        src.columns = ["Source","Count"]
-
-        fig = px.pie(
-            src,
-            names="Source",
-            values="Count",
-            hole=0.5,
-            title="Population Architecture"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-    with right:
-        zyg = filtered_df["zygosity_label"].value_counts().reset_index()
-        zyg.columns = ["Zygosity","Count"]
-
-        fig2 = px.bar(
-            zyg,
-            x="Zygosity",
-            y="Count",
-            color="Zygosity",
-            title="Zygosity Landscape"
-        )
-        st.plotly_chart(fig2, use_container_width=True)
-
-    st.markdown("---")
-
-    st.markdown("## Translational Interpretation")
-
-    st.info(
-        """
-        Elevated homozygosity in Saudi rare disease cohorts reflects strong consanguinity-driven
-        autosomal recessive architecture. This increases founder mutation enrichment and enables
-        powerful phenotype-driven genomic discovery. Integrating HPO semantic intelligence with AI
-        prioritization provides clinically actionable interpretation for unsolved rare disease cases.
-        """
-    )
-
-# =========================================================
-# COHORT ANALYTICS
-# =========================================================
-elif page == "Cohort Analytics":
-
-    st.markdown('<div class="section-title">📊 Interactive Cohort Analytics</div>', unsafe_allow_html=True)
-
-    c1, c2 = st.columns(2)
+    c1, c2, c3, c4, c5 = st.columns(5)
 
     with c1:
-        solved = filtered_df["solved_status"].value_counts().reset_index()
-        solved.columns = ["Status","Count"]
-
-        fig = px.bar(
-            solved,
-            x="Status",
-            y="Count",
-            color="Status",
-            title="Solved vs Unsolved"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-number">{TOTAL_CASES:,}</div>
+            <div class="metric-label">Patient Cases</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with c2:
-        acmg = filtered_df["acmg_classification"].value_counts().reset_index()
-        acmg.columns = ["ACMG","Count"]
-
-        fig2 = px.pie(
-            acmg,
-            names="ACMG",
-            values="Count",
-            hole=0.45,
-            title="ACMG Classification"
-        )
-        st.plotly_chart(fig2, use_container_width=True)
-
-    c3, c4 = st.columns(2)
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-number">{TOTAL_GENES:,}</div>
+            <div class="metric-label">Disease Genes</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with c3:
-        fig3 = px.histogram(
-            filtered_df,
-            x="hpo_count",
-            nbins=40,
-            title="Phenotype Burden"
-        )
-        st.plotly_chart(fig3, use_container_width=True)
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-number">{TOTAL_DISEASES:,}</div>
+            <div class="metric-label">Rare Diseases</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with c4:
-        top_dis = filtered_df["disease_label"].value_counts().head(20)
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-number">{SOLVED_CASES:,}</div>
+            <div class="metric-label">Solved Cases</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-        fig4 = px.bar(
-            x=top_dis.values,
-            y=top_dis.index,
-            orientation='h',
-            title="Disease Frequency"
-        )
-        st.plotly_chart(fig4, use_container_width=True)
+    with c5:
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-number">{NEURO_CASES:,}</div>
+            <div class="metric-label">Neuro Cases</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("---")
+    st.markdown("## Cohort Landscape")
 
-    alt_df = filtered_df[["source","hpo_count"]]
+    solved_counts = df["solved_status"].value_counts().reset_index()
+    solved_counts.columns = ["Status", "Cases"]
 
-    chart = alt.Chart(alt_df).mark_boxplot().encode(
-        x='source:N',
-        y='hpo_count:Q',
-        color='source:N'
-    ).properties(
-        title='Phenotype Burden Across Populations'
+    fig = px.pie(
+        solved_counts,
+        names="Status",
+        values="Cases",
+        hole=0.5
     )
 
-    st.altair_chart(chart, use_container_width=True)
-
-# =========================================================
-# FOUNDER INTELLIGENCE
-# =========================================================
-elif page == "Founder Intelligence":
-
-    st.markdown('<div class="section-title">🧬 Founder Mutation Intelligence</div>', unsafe_allow_html=True)
-
-    if founders_df.empty:
-        st.error("Founder mutation dataset missing")
-        st.stop()
-
-    founders_df["Founder Type"] = founders_df["is_known"].map(
-        {True:"Known Founder", False:"Novel Candidate"}
-    )
-
-    fig = px.scatter(
-        founders_df,
-        x="n_cases",
-        y="gene_symbol",
-        color="Founder Type",
-        size="n_cases",
-        hover_data=["hgvs_c","zygosity_label"],
-        title="Founder Mutation Explorer"
-    )
+    fig.update_layout(height=450)
 
     st.plotly_chart(fig, use_container_width=True)
 
-    st.markdown("---")
+# =====================================================================================
+# COHORT ANALYTICS
+# =====================================================================================
 
-    gene_query = st.text_input("Search Founder Gene")
+elif section == "Cohort Analytics":
 
-    if gene_query:
-        sub = founders_df[
-            founders_df["gene_symbol"].str.contains(gene_query, case=False, na=False)
-        ]
-        st.dataframe(sub, use_container_width=True)
+    st.markdown('<div class="section-title">Cohort Analytics</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
+    col1, col2 = st.columns(2)
 
-    st.subheader("Founder Ranking")
+    with col1:
 
-    founders_ranked = founders_df.sort_values("n_cases", ascending=False)
+        source_counts = df["source"].value_counts().reset_index()
+        source_counts.columns = ["Source", "Cases"]
 
-    st.dataframe(founders_ranked, use_container_width=True)
+        fig = px.bar(
+            source_counts,
+            x="Source",
+            y="Cases",
+            color="Source"
+        )
 
-# =========================================================
-# AI GENE PRIORITIZATION
-# =========================================================
-elif page == "AI Gene Prioritization":
+        fig.update_layout(height=450)
 
-    st.markdown('<div class="section-title">🤖 AI Gene Prioritization Console</div>', unsafe_allow_html=True)
+        st.plotly_chart(fig, use_container_width=True)
 
-    if pred_df.empty:
-        st.error("Prediction dataset missing")
-        st.stop()
+    with col2:
 
-    selected_case = st.selectbox(
-        "Select Patient Case",
-        pred_df["case_id"].astype(str)
+        acmg = df["acmg_classification"].value_counts().reset_index()
+        acmg.columns = ["Classification", "Cases"]
+
+        fig = px.pie(
+            acmg,
+            names="Classification",
+            values="Cases"
+        )
+
+        fig.update_layout(height=450)
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("### HPO Burden")
+
+    fig = px.histogram(
+        df,
+        x="hpo_count",
+        nbins=30
     )
 
-    row = pred_df[pred_df["case_id"].astype(str) == selected_case].iloc[0]
-
-    c1, c2, c3 = st.columns(3)
-
-    with c1:
-        st.metric("Top Candidate", row["predicted_gene_1"])
-
-    with c2:
-        st.metric("Second Candidate", row["predicted_gene_2"])
-
-    with c3:
-        st.metric("Third Candidate", row["predicted_gene_3"])
-
-    st.markdown("---")
-
-    st.subheader("Phenotype Architecture")
-
-    st.code(row["hpo_terms"])
-
-    st.markdown("---")
-
-    overlap = pd.DataFrame({
-        "Gene":[
-            row["predicted_gene_1"],
-            row["predicted_gene_2"],
-            row["predicted_gene_3"]
-        ],
-        "Phenotype Overlap Score":[0.91,0.74,0.62]
-    })
-
-    fig = px.bar(
-        overlap,
-        x="Gene",
-        y="Phenotype Overlap Score",
-        color="Phenotype Overlap Score",
-        title="HPO Semantic Match"
-    )
+    fig.update_layout(height=450)
 
     st.plotly_chart(fig, use_container_width=True)
 
-    st.info(
-        "AI prioritization integrates phenotype architecture and Saudi founder disease enrichment patterns for unsolved case interpretation."
-    )
+# =====================================================================================
+# POPULATION GENOMICS
+# =====================================================================================
 
-# =========================================================
-# HPO INTELLIGENCE
-# =========================================================
-elif page == "HPO Intelligence":
+elif section == "Population Genomics":
 
-    st.markdown('<div class="section-title">🧠 HPO Intelligence System</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Population Genomics</div>', unsafe_allow_html=True)
 
-    all_hpo = filtered_df["hpo_list"].explode().dropna()
+    fig_path = OUTPUT_DIR / "fig05_population_comparison.png"
 
-    top_hpo = all_hpo.value_counts().head(30)
+    if fig_path.exists():
+        st.image(str(fig_path), use_container_width=True)
 
-    fig = px.bar(
-        x=top_hpo.values,
-        y=top_hpo.index,
-        orientation='h',
-        title="Top Phenotypes"
-    )
+    st.markdown("""
+    ### Key Interpretation
 
-    st.plotly_chart(fig, use_container_width=True)
+    The Saudi cohort demonstrates substantially elevated homozygosity compared
+    with the DDD UK cohort, reflecting the genomic impact of consanguinity-driven
+    autosomal recessive disease architecture.
+    """)
 
-    st.markdown("---")
+# =====================================================================================
+# FOUNDER MUTATIONS
+# =====================================================================================
 
-    search_hpo = st.text_input("Search Phenotype")
+elif section == "Founder Mutations":
 
-    if search_hpo:
-        matched = [x for x in all_hpo.unique() if search_hpo.lower() in str(x).lower()]
-        st.write(matched)
+    st.markdown('<div class="section-title">Founder Mutation Discovery</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
+    founder_df = load_csv("data_founder_mutations.csv")
 
-    if not hpo_matrix.empty:
+    if not founder_df.empty:
 
-        matrix = hpo_matrix.iloc[:18, :18]
+        top_founders = founder_df.head(25)
 
-        G = nx.Graph()
-
-        for i in matrix.index:
-            for j in matrix.columns:
-                val = matrix.loc[i,j]
-                if val > 0 and i != j:
-                    G.add_edge(i,j,weight=val)
-
-        pos = nx.spring_layout(G, seed=42)
-
-        edge_x = []
-        edge_y = []
-
-        for edge in G.edges():
-            x0, y0 = pos[edge[0]]
-            x1, y1 = pos[edge[1]]
-            edge_x.extend([x0, x1, None])
-            edge_y.extend([y0, y1, None])
-
-        edge_trace = go.Scatter(
-            x=edge_x,
-            y=edge_y,
-            mode='lines'
+        fig = px.scatter(
+            top_founders,
+            x="gene_symbol",
+            y="n_cases",
+            size="n_cases",
+            color="is_known",
+            hover_data=["hgvs_c", "annotation"]
         )
 
-        node_x = []
-        node_y = []
-        node_text = []
+        fig.update_layout(height=650)
 
-        for node in G.nodes():
-            x, y = pos[node]
-            node_x.append(x)
-            node_y.append(y)
-            node_text.append(node)
+        st.plotly_chart(fig, use_container_width=True)
 
-        node_trace = go.Scatter(
-            x=node_x,
-            y=node_y,
-            mode='markers+text',
-            text=node_text,
-            hoverinfo='text',
-            marker=dict(size=20)
-        )
+        st.dataframe(top_founders, use_container_width=True)
 
-        fig_net = go.Figure(data=[edge_trace, node_trace])
-
-        fig_net.update_layout(
-            title="Phenotype Co-occurrence Network",
-            showlegend=False,
-            height=800
-        )
-
-        st.plotly_chart(fig_net, use_container_width=True)
-
-# =========================================================
-# DISEASE SIMILARITY
-# =========================================================
-elif page == "Disease Similarity":
-
-    st.markdown('<div class="section-title">🧬 Disease Similarity Engine</div>', unsafe_allow_html=True)
-
-    if sim_df.empty:
-        st.error("Similarity matrix missing")
-        st.stop()
-
-    fig = ff.create_annotated_heatmap(
-        z=sim_df.values,
-        x=list(sim_df.columns),
-        y=list(sim_df.index),
-        colorscale='Viridis'
-    )
-
-    fig.update_layout(
-        title="Phenotype Relationship Heatmap",
-        height=1200
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-    st.info(
-        "Phenotype similarity architecture enables disease relationship discovery and semantic clustering across rare disease entities."
-    )
-
-# =========================================================
+# =====================================================================================
 # TREATABLE DISEASES
-# =========================================================
-elif page == "Treatable Diseases":
+# =====================================================================================
 
-    st.markdown('<div class="section-title">💊 Treatable Disease Intelligence</div>', unsafe_allow_html=True)
+elif section == "Treatable Diseases":
 
-    if treat_df.empty:
-        st.error("Treatable disease file missing")
-        st.stop()
+    st.markdown('<div class="section-title">Treatable Disease Intelligence</div>', unsafe_allow_html=True)
 
-    urgent = treat_df[
-        treat_df["solved_status"] == "IN_PROGRESS"
-    ]
+    treat_df = load_csv("data_treatable_cases.csv")
 
-    c1, c2 = st.columns(2)
+    if not treat_df.empty:
 
-    with c1:
-        st.metric("Treatable Cases", len(treat_df))
-
-    with c2:
-        st.metric("Urgent Unsolved", len(urgent))
-
-    st.markdown("---")
-
-    summary = treat_df.groupby("gene_symbol")["n"].sum().reset_index()
-
-    fig = px.bar(
-        summary,
-        x="gene_symbol",
-        y="n",
-        color="n",
-        title="Therapeutically Actionable Genes"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-    st.markdown("---")
-
-    st.subheader("Precision Medicine Impact")
-
-    st.success(
-        "Rapid identification of founder-driven treatable disorders can directly improve early intervention and clinical outcomes in Saudi pediatric rare disease populations."
-    )
-
-    st.dataframe(urgent, use_container_width=True)
-
-# =========================================================
-# FIGURE EXPLORER
-# =========================================================
-elif page == "Figure Explorer":
-
-    st.markdown('<div class="section-title">🖼️ Interactive Figure Explorer</div>', unsafe_allow_html=True)
-
-    figures = sorted([
-        f for f in os.listdir(OUTPUT_DIR)
-        if f.endswith(".png")
-    ])
-
-    if len(figures) == 0:
-        st.error("No figures detected")
-        st.stop()
-
-    selected = st.selectbox("Select Figure", figures)
-
-    st.image(
-        os.path.join(OUTPUT_DIR, selected),
-        use_container_width=True
-    )
-
-    with open(os.path.join(OUTPUT_DIR, selected), "rb") as f:
-        st.download_button(
-            "Download Figure",
-            f,
-            file_name=selected,
-            mime="image/png"
+        fig = px.bar(
+            treat_df,
+            x="gene_symbol",
+            y="n",
+            color="solved_status",
+            hover_data=["treatment"]
         )
 
-# =========================================================
-# FOOTER
-# =========================================================
-st.markdown("---")
+        fig.update_layout(height=600)
 
-st.caption(
-    "PAVS Translational Genomics Platform | Founder Mutations | HPO AI | Saudi Population Genomics"
-)
- 
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.dataframe(treat_df, use_container_width=True)
+
+# =====================================================================================
+# NEURO BURDEN
+# =====================================================================================
+
+elif section == "Neurodevelopmental Burden":
+
+    st.markdown('<div class="section-title">Neurodevelopmental Burden</div>', unsafe_allow_html=True)
+
+    fig_path = OUTPUT_DIR / "fig09_neuro_burden.png"
+
+    if fig_path.exists():
+        st.image(str(fig_path), use_container_width=True)
+
+# =====================================================================================
+# DISEASE SIMILARITY
+# =====================================================================================
+
+elif section == "Disease Similarity":
+
+    st.markdown('<div class="section-title">Disease Phenotype Similarity</div>', unsafe_allow_html=True)
+
+    sim_df = load_csv("data_disease_hpo_similarity.csv")
+
+    if not sim_df.empty:
+
+        fig = px.imshow(
+            sim_df,
+            aspect="auto"
+        )
+
+        fig.update_layout(height=900)
+
+        st.plotly_chart(fig, use_container_width=True)
+
+# =====================================================================================
+# AI GENE PRIORITIZATION
+# =====================================================================================
+
+elif section == "AI Gene Prioritization":
+
+    st.markdown('<div class="section-title">AI Gene Prioritization</div>', unsafe_allow_html=True)
+
+    pred_df = load_csv("data_gene_predictions_unsolved.csv")
+
+    if not pred_df.empty:
+
+        st.markdown("### Unsolved Case Predictions")
+
+        case_search = st.text_input("Search Case ID")
+
+        if case_search:
+            pred_df = pred_df[
+                pred_df["case_id"].astype(str).str.contains(case_search)
+            ]
+
+        st.dataframe(pred_df, use_container_width=True)
+
+    fig_path = OUTPUT_DIR / "fig11_gene_model.png"
+
+    if fig_path.exists():
+        st.image(str(fig_path), use_container_width=True)
+
+# =====================================================================================
+# PATHOGENICITY
+# =====================================================================================
+
+elif section == "Pathogenicity Intelligence":
+
+    st.markdown('<div class="section-title">Pathogenicity Intelligence</div>', unsafe_allow_html=True)
+
+    fig_path = OUTPUT_DIR / "fig13_pathogenicity_PR.png"
+
+    if fig_path.exists():
+        st.image(str(fig_path), use_container_width=True)
+
+# =====================================================================================
+# VUS
+# =====================================================================================
+
+elif section == "VUS Reclassification":
+
+    st.markdown('<div class="section-title">VUS Reclassification</div>', unsafe_allow_html=True)
+
+    vus_df = load_csv("data_VUS_reclassification.csv")
+
+    if not vus_df.empty:
+
+        st.dataframe(vus_df, use_container_width=True)
+
+# =====================================================================================
+# HPO
+# =====================================================================================
+
+elif section == "HPO Architecture":
+
+    st.markdown('<div class="section-title">HPO Architecture</div>', unsafe_allow_html=True)
+
+    fig_path = OUTPUT_DIR / "fig14_hpo_cooccurrence.png"
+
+    if fig_path.exists():
+        st.image(str(fig_path), use_container_width=True)
+
+# =====================================================================================
+# ADAT3
+# =====================================================================================
+
+elif section == "ADAT3 Deep Dive":
+
+    st.markdown('<div class="section-title">ADAT3 Founder Deep Dive</div>', unsafe_allow_html=True)
+
+    fig_path = OUTPUT_DIR / "fig15_ADAT3_deepdive.png"
+
+    if fig_path.exists():
+        st.image(str(fig_path), use_container_width=True)
+
+# =====================================================================================
+# FIGURE EXPLORER
+# =====================================================================================
+
+elif section == "Figure Explorer":
+
+    st.markdown('<div class="section-title">Figure Explorer</div>', unsafe_allow_html=True)
+
+    figs = sorted(OUTPUT_DIR.glob("*.png"))
+
+    for fig_file in figs:
+
+        st.markdown(f"### {fig_file.name}")
+
+        st.image(str(fig_file), use_container_width=True)
+
+# =====================================================================================
+# RESEARCH SUMMARY
+# =====================================================================================
+
+elif section == "Research Summary":
+
+    st.markdown('<div class="section-title">Research Summary</div>', unsafe_allow_html=True)
+
+    st.markdown(f"""
+    ## Key Findings
+
+    - {TOTAL_CASES:,} rare disease cases analyzed
+    - {TOTAL_GENES:,} disease-associated genes identified
+    - {TOTAL_DISEASES:,} rare diseases represented
+    - Elevated homozygosity confirms strong consanguinity-driven architecture
+    - Founder mutation discovery identified recurrent Saudi pathogenic variants
+    - AI HPO-driven prioritization successfully predicts causal genes
+    - Neurodevelopmental disorders dominate disease burden
+    - Treatable unsolved patients identified for precision medicine intervention
+    - VUS prioritization framework generated clinically actionable candidates
+
+    ## Translational Significance
+
+    This project establishes a computational genomics framework for:
+    - Arab population genomics
+    - founder mutation discovery
+    - phenotype-driven AI diagnostics
+    - rare disease prioritization
+    - translational precision medicine
+
+    ## Target Research Domains
+
+    - Rare Disease Genomics
+    - Computational Biology
+    - Bioinformatics
+    - Clinical Genomics
+    - Population Genetics
+    - AI-driven Precision Medicine
+    """)
