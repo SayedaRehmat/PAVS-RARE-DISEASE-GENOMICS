@@ -36,22 +36,7 @@ This is a reproducible research pipeline designed for **population-aware precisi
 
 These results highlight strong population-specific genetic architecture driven by founder effects and consanguinity.
 
----
 
-## Live Demo
-
-An interactive Streamlit dashboard is included for exploration of:
-
-* Cohort-level statistics
-* Founder mutation landscape
-* Phenotype (HPO) distribution
-* Gene prioritization outputs
-* Disease similarity networks
-* Treatable disease candidates
-
-👉 [https://pavs-rare-disease-genomics-xwf2r7z3xdmms8w4xfyagg.streamlit.app/](https://pavs-rare-disease-genomics-xwf2r7z3xdmms8w4xfyagg.streamlit.app/)
-
----
 
 ## Methodology Pipeline
 
@@ -261,8 +246,8 @@ Limitations include:
 ## Author
 
 **Sayeda Rehmat**
-Computational genomics & AI for precision medicine
-Focused on rare disease interpretation and population-aware genomic systems
+
+Computational genomics & AI for precision medicine      Focused on rare disease interpretation and population-aware genomic systems
 
 ---
 
