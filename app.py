@@ -1,24 +1,20 @@
-# app.py
+# =========================================================
+# PAVS RARE DISEASE GENOMICS PLATFORM
+# FINAL PROFESSIONAL STREAMLIT DASHBOARD
+# Fully Auto-Compatible with BOTH Dark + Light Themes
+# =========================================================
 
- 
-import os
-import json
-import warnings
-from pathlib import Path
-
-import numpy as np
-import pandas as pd
 import streamlit as st
+import pandas as pd
+import numpy as np
+from pathlib import Path
+from PIL import Image
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-from PIL import Image
 
-warnings.filterwarnings("ignore")
-
-# ============================================================
-# CONFIGURATION
-# ============================================================
+# =========================================================
+# PAGE CONFIG
+# =========================================================
 
 st.set_page_config(
     page_title="PAVS Rare Disease Genomics",
@@ -27,756 +23,943 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-ROOT = Path(__file__).resolve().parent
-DATA_DIR = ROOT / "data"
-OUTPUT_DIR = ROOT / "outputs"
-FIG_DIR = OUTPUT_DIR / "figures"
-TABLE_DIR = OUTPUT_DIR / "tables"
+# =========================================================
+# PATHS
+# =========================================================
 
-# ============================================================
-# THEME-AWARE CSS
-# ============================================================
+BASE_DIR = Path(".")
+TABLE_DIR = BASE_DIR / "outputs" / "tables"
+FIG_DIR = BASE_DIR / "outputs" / "figures"
 
-st.markdown(
-    """
-    <style>
+# =========================================================
+# DATA LOADER
+# =========================================================
 
-    :root {
-        --radius: 18px;
-    }
+@st.cache_data
+def load_csv(name):
 
-    .main {
-        padding-top: 0.5rem;
-    }
-
-    .block-container {
-        padding-top: 1.2rem;
-        padding-bottom: 2rem;
-        max-width: 95rem;
-    }
-
-    h1, h2, h3, h4 {
-        font-weight: 700 !important;
-        letter-spacing: -0.02em;
-    }
-
-    .hero-card {
-        border-radius: 24px;
-        padding: 2rem;
-        background: linear-gradient(135deg, rgba(0,102,255,0.12), rgba(180,0,255,0.12));
-        border: 1px solid rgba(120,120,120,0.18);
-        margin-bottom: 1.2rem;
-    }
-
-    .metric-card {
-        border-radius: var(--radius);
-        padding: 1rem;
-        border: 1px solid rgba(128,128,128,0.18);
-        backdrop-filter: blur(10px);
-        background-color: rgba(255,255,255,0.03);
-        transition: 0.25s ease-in-out;
-    }
-
-    .metric-card:hover {
-        transform: translateY(-4px);
-        border: 1px solid rgba(0,140,255,0.4);
-    }
-
-    .section-card {
-        border-radius: 20px;
-        padding: 1rem 1.25rem 1rem 1.25rem;
-        border: 1px solid rgba(120,120,120,0.18);
-        background-color: rgba(255,255,255,0.03);
-        margin-bottom: 1rem;
-    }
-
-    .glass {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(120,120,120,0.16);
-        backdrop-filter: blur(12px);
-        border-radius: 20px;
-        padding: 1rem;
-    }
-
-    .sidebar-title {
-        font-size: 1.15rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-    }
-
-    footer {
-        visibility: hidden;
-    }
-
-    header {
-        visibility: hidden;
-    }
-
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# ============================================================
-# HELPERS
-# ============================================================
-
-@st.cache_data(show_spinner=False)
-def load_table(name):
     path = TABLE_DIR / name
+
     if path.exists():
         return pd.read_csv(path)
+
     return pd.DataFrame()
 
+# =========================================================
+# LOAD TABLES
+# =========================================================
 
-@st.cache_data(show_spinner=False)
-def load_cases():
-    path = DATA_DIR / "PAVS_cases.tsv"
-    if path.exists():
-        return pd.read_csv(path, sep="\t")
-    return pd.DataFrame()
+founder_df = load_csv("data_founder_mutations.csv")
+vus_df = load_csv("data_VUS_reclassification.csv")
+treat_df = load_csv("data_treatable_cases.csv")
+pred_df = load_csv("data_gene_predictions_unsolved.csv")
+similarity_df = load_csv("data_disease_hpo_similarity.csv")
 
+# =========================================================
+# AUTO LIGHT/DARK CSS
+# =========================================================
 
-@st.cache_data(show_spinner=False)
-def load_image(name):
-    path = FIG_DIR / name
-    if path.exists():
-        return Image.open(path)
-    return None
+st.markdown("""
+<style>
 
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@300;400;500;700&family=Sora:wght@300;400;500;600&display=swap');
 
-cases_df = load_cases()
-founder_df = load_table("data_founder_mutations.csv")
-vus_df = load_table("data_VUS_reclassification.csv")
-gene_df = load_table("data_gene_predictions_unsolved.csv")
-hpo_df = load_table("data_hpo_cooccurrence.csv")
-disease_similarity_df = load_table("data_disease_hpo_similarity.csv")
-population_df = load_table("data_population_comparison.csv")
-treatable_df = load_table("data_treatable_cases.csv")
+/* ======================================================
+AUTO THEME VARIABLES
+====================================================== */
 
-# ============================================================
+:root {
+
+    --green:#00C9A7;
+    --blue:#4F8EF7;
+    --orange:#F7924F;
+    --purple:#A78BFA;
+    --red:#F87171;
+
+}
+
+/* ======================================================
+DARK MODE
+====================================================== */
+
+@media (prefers-color-scheme: dark) {
+
+    :root {
+
+        --bg:#050816;
+        --card:#0D1226;
+        --card2:#121933;
+        --text:#F2F6FF;
+        --muted:#8B9EC4;
+        --border:rgba(255,255,255,.07);
+
+    }
+
+}
+
+/* ======================================================
+LIGHT MODE
+====================================================== */
+
+@media (prefers-color-scheme: light) {
+
+    :root {
+
+        --bg:#F5F7FC;
+        --card:#FFFFFF;
+        --card2:#F9FBFF;
+        --text:#111827;
+        --muted:#5B6475;
+        --border:rgba(0,0,0,.06);
+
+    }
+
+}
+
+/* ======================================================
+GLOBAL
+====================================================== */
+
+html, body, .stApp {
+
+    background: var(--bg) !important;
+    color: var(--text) !important;
+    font-family:'Sora', sans-serif;
+
+}
+
+body {
+
+    overflow-x: hidden;
+
+}
+
+.stApp {
+
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(0,201,167,.08),
+            transparent 30%
+        ),
+
+        radial-gradient(
+            circle at bottom left,
+            rgba(79,142,247,.08),
+            transparent 30%
+        ),
+
+        var(--bg);
+
+}
+
+.block-container {
+
+    max-width: 1650px;
+    padding-top: 1rem;
+    padding-bottom: 3rem;
+
+}
+
+/* ======================================================
+TEXT
+====================================================== */
+
+p, span, div, label {
+
+    color: var(--text);
+
+}
+
+h1, h2, h3, h4 {
+
+    font-family:'DM Serif Display', serif;
+    color: var(--text);
+
+}
+
+.small-text {
+
+    color: var(--muted);
+    line-height: 1.9;
+
+}
+
+/* ======================================================
+SIDEBAR
+====================================================== */
+
+[data-testid="stSidebar"] {
+
+    background:
+        linear-gradient(
+            180deg,
+            var(--card),
+            var(--card2)
+        );
+
+    border-right: 1px solid var(--border);
+
+}
+
+[data-testid="stSidebar"] * {
+
+    color: var(--text) !important;
+
+}
+
+/* ======================================================
+SIDEBAR RADIO
+====================================================== */
+
+.stRadio > div {
+
+    gap: .5rem;
+
+}
+
+.stRadio label {
+
+    background: var(--card2);
+    border: 1px solid var(--border);
+    padding: .55rem .8rem;
+    border-radius: 12px;
+    transition: .2s;
+
+}
+
+.stRadio label:hover {
+
+    border-color: var(--green);
+
+}
+
+/* ======================================================
+HERO SECTION
+====================================================== */
+
+.hero {
+
+    position: relative;
+    overflow: hidden;
+
+    border-radius: 34px;
+
+    padding: 4rem;
+
+    margin-bottom: 2rem;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--card),
+            var(--card2)
+        );
+
+    border: 1px solid var(--border);
+
+    box-shadow:
+        0 20px 40px rgba(0,0,0,.12);
+
+}
+
+.hero::before {
+
+    content: '';
+
+    position: absolute;
+
+    top: -120px;
+    right: 120px;
+
+    width: 460px;
+    height: 460px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(0,201,167,.12),
+            transparent 70%
+        );
+
+}
+
+/* ======================================================
+CARDS
+====================================================== */
+
+.metric-card {
+
+    background:
+        linear-gradient(
+            180deg,
+            var(--card),
+            var(--card2)
+        );
+
+    border: 1px solid var(--border);
+
+    border-radius: 24px;
+
+    padding: 1.5rem;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.08);
+
+}
+
+.metric-number {
+
+    font-size: 2rem;
+    font-weight: 700;
+
+    font-family:'JetBrains Mono', monospace;
+
+}
+
+.metric-label {
+
+    font-size: .72rem;
+
+    letter-spacing: .12em;
+
+    text-transform: uppercase;
+
+    color: var(--muted);
+
+    margin-top: .4rem;
+
+}
+
+.section-card {
+
+    background:
+        linear-gradient(
+            180deg,
+            var(--card),
+            var(--card2)
+        );
+
+    border: 1px solid var(--border);
+
+    border-radius: 30px;
+
+    padding: 2rem;
+
+    margin-bottom: 1.5rem;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.05);
+
+}
+
+/* ======================================================
+INPUTS
+====================================================== */
+
+.stTextInput input,
+.stTextArea textarea,
+.stSelectbox div[data-baseweb="select"] {
+
+    background: var(--card2) !important;
+    color: var(--text) !important;
+
+    border: 1px solid var(--border) !important;
+
+    border-radius: 12px !important;
+
+}
+
+/* ======================================================
+BUTTONS
+====================================================== */
+
+.stButton button {
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--green),
+            var(--blue)
+        );
+
+    color: white !important;
+
+    border: none;
+
+    border-radius: 12px;
+
+    padding: .7rem 1.2rem;
+
+    font-weight: 600;
+
+}
+
+.stButton button:hover {
+
+    opacity: .92;
+
+}
+
+/* ======================================================
+DATAFRAME
+====================================================== */
+
+[data-testid="stDataFrame"] {
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+
+}
+
+/* ======================================================
+METRIC WIDGET
+====================================================== */
+
+[data-testid="metric-container"] {
+
+    background: var(--card);
+
+    border: 1px solid var(--border);
+
+    border-radius: 20px;
+
+    padding: 1rem;
+
+}
+
+/* ======================================================
+PLOTLY
+====================================================== */
+
+.js-plotly-plot {
+
+    border-radius: 24px;
+    overflow: hidden;
+
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================================
 # SIDEBAR
-# ============================================================
+# =========================================================
 
 with st.sidebar:
 
-    st.markdown("<div class='sidebar-title'>🧬 PAVS Analytics Suite</div>", unsafe_allow_html=True)
+    st.markdown("## 🧬 PAVS Platform")
 
-    selected = st.radio(
+    st.caption(
+        "Population-Aware Rare Disease Genomics"
+    )
+
+    st.markdown("---")
+
+    section = st.radio(
         "Navigation",
         [
-            "Executive Dashboard",
-            "Cohort Analysis",
-            "Variant Landscape",
-            "VUS Reclassification",
-            "Causal Discovery",
-            "Population Genetics",
-            "Phenotype Intelligence",
+            "Overview",
+            "Population Architecture",
             "Founder Mutations",
-            "Treatable Disorders",
-            "Model Performance",
-            "Research Summary"
+            "HPO Landscape",
+            "AI Prioritization",
+            "Treatable Diseases",
+            "Variant Intelligence",
+            "Disease Similarity",
+            "Visual Analytics",
+            "Research Basis"
         ]
     )
 
-    st.divider()
+    st.markdown("---")
 
-    st.markdown("### Dataset Information")
+    st.metric("Patient Cases", "7,510")
+    st.metric("Founder Variants", "129")
+    st.metric("Unique Diseases", "1,838")
 
-    st.info(
-        """
-        Population-aware rare disease genomics platform integrating:
+# =========================================================
+# HERO
+# =========================================================
 
-        • Saudi PAVS cohort
-        • ClinVar annotations
-        • gnomAD population frequency
-        • ACMG-style reclassification
-        • HPO-driven prioritization
-        • Explainable AI
-        """
-    )
+st.markdown("""
+<div class="hero">
 
-# ============================================================
-# HERO SECTION
-# ============================================================
+<div style="position:relative;z-index:2;">
 
-st.markdown(
-    """
-    <div class='hero-card'>
-        <h1>Population-Aware Variant Reclassification and Causal Discovery</h1>
-        <p style='font-size:1.05rem;'>
-        Clinical genomics analytics environment for underrepresented populations integrating
-        cohort-scale pathogenicity modeling, phenotype-aware prioritization, founder effect
-        discovery, and explainable AI.
-        </p>
+<div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.2rem;">
+
+<span style="
+font-size:.72rem;
+padding:6px 12px;
+border-radius:6px;
+background:rgba(0,201,167,.12);
+color:#00C9A7;
+border:1px solid rgba(0,201,167,.25);
+text-transform:uppercase;
+letter-spacing:.12em;
+font-family:'JetBrains Mono', monospace;
+">
+Research Project · 2026
+</span>
+
+<span style="
+font-size:.72rem;
+padding:6px 12px;
+border-radius:6px;
+background:rgba(79,142,247,.12);
+color:#4F8EF7;
+border:1px solid rgba(79,142,247,.25);
+text-transform:uppercase;
+letter-spacing:.12em;
+font-family:'JetBrains Mono', monospace;
+">
+KAUST · CBRC · Bio-Ontology Group
+</span>
+
+</div>
+
+<h1 style="
+font-size:4rem;
+line-height:1.1;
+margin-bottom:1rem;
+">
+
+Rare Disease Genomics<br>
+
+<em style="color:#00C9A7;">
+in the Arab World
+</em>
+
+</h1>
+
+<p style="
+max-width:760px;
+font-size:1.05rem;
+line-height:1.9;
+color:var(--muted);
+">
+
+A computational genomics intelligence platform analyzing
+7,510 Saudi rare disease cases using founder mutation
+discovery, phenotype-driven AI prioritization,
+HPO architecture analysis, and precision medicine analytics.
+
+</p>
+
+</div>
+</div>
+""", unsafe_allow_html=True)
+
+# =========================================================
+# METRICS
+# =========================================================
+
+c1, c2, c3, c4, c5 = st.columns(5)
+
+metrics = [
+    ("7,510", "Patient Cases", "#00C9A7"),
+    ("2,523", "Disease Genes", "#4F8EF7"),
+    ("1,838", "Rare Diseases", "#F7924F"),
+    ("24,446", "Unique HPO Terms", "#A78BFA"),
+    ("129", "Founder Variants", "#F87171")
+]
+
+for col, metric in zip(
+    [c1, c2, c3, c4, c5],
+    metrics
+):
+
+    value, label, color = metric
+
+    with col:
+
+        st.markdown(f"""
+        <div class="metric-card">
+
+            <div
+            class="metric-number"
+            style="color:{color};">
+            {value}
+            </div>
+
+            <div class="metric-label">
+            {label}
+            </div>
+
+        </div>
+        """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# =========================================================
+# OVERVIEW
+# =========================================================
+
+if section == "Overview":
+
+    st.markdown("""
+    <div class="section-card">
+
+    <h2>Research Overview</h2>
+
+    <p class="small-text">
+
+    This platform reconstructs population-specific
+    rare disease architecture in Arab cohorts using:
+
+    founder mutation discovery,
+    phenotype intelligence,
+    explainable AI prioritization,
+    disease similarity modeling,
+    variant interpretation,
+    and precision medicine analytics.
+
+    </p>
+
     </div>
-    """,
-    unsafe_allow_html=True,
-)
+    """, unsafe_allow_html=True)
 
-# ============================================================
-# KPI STRIP
-# ============================================================
+    col1, col2 = st.columns([1.3, 1])
 
-col1, col2, col3, col4, col5 = st.columns(5)
+    with col1:
 
-with col1:
-    st.metric("Cases", f"{len(cases_df):,}")
+        fig = go.Figure()
 
-with col2:
-    st.metric("Reclassified VUS", f"{len(vus_df):,}")
-
-with col3:
-    st.metric("Founder Variants", f"{len(founder_df):,}")
-
-with col4:
-    st.metric("Candidate Genes", f"{gene_df.shape[0]:,}")
-
-with col5:
-    st.metric("Treatable Disorders", f"{treatable_df.shape[0]:,}")
-
-st.write("")
-
-# ============================================================
-# EXECUTIVE DASHBOARD
-# ============================================================
-
-if selected == "Executive Dashboard":
-
-    st.subheader("Integrated Cohort Dashboard")
-
-    dashboard_img = load_image("fig00_FINAL_DASHBOARD.png")
-
-    if dashboard_img:
-        st.image(dashboard_img, use_container_width=True)
-
-    st.write("")
-
-    c1, c2 = st.columns([1.2, 1])
-
-    with c1:
-
-        st.markdown("### Key Findings")
-
-        st.markdown(
-            """
-            - High burden of autosomal recessive disease architecture
-            - Strong enrichment of founder mutations
-            - Significant VUS burden reduced via calibrated classification
-            - Phenotype-guided prioritization improves causal ranking
-            - Population-specific allele frequencies improve specificity
-            - Underrepresented cohorts demonstrate distinct pathogenic spectra
-            """
+        fig.add_trace(
+            go.Bar(
+                x=["Saudi", "DDD UK"],
+                y=[52.2, 0],
+                text=["52.2%", "0%"],
+                textposition="outside"
+            )
         )
 
-    with c2:
-
-        if not vus_df.empty:
-
-            if "reclassified_label" in vus_df.columns:
-                fig = px.pie(
-                    vus_df,
-                    names="reclassified_label",
-                    title="VUS Reclassification Distribution"
-                )
-                fig.update_layout(height=420)
-                st.plotly_chart(fig, use_container_width=True)
-
-# ============================================================
-# COHORT ANALYSIS
-# ============================================================
-
-elif selected == "Cohort Analysis":
-
-    st.subheader("Cohort-Level Genomic Architecture")
-
-    img = load_image("fig01_cohort_overview.png")
-    if img:
-        st.image(img, use_container_width=True)
-
-    st.write("")
-
-    if not cases_df.empty:
-
-        cols = st.columns(3)
-
-        categorical_columns = [
-            c for c in cases_df.columns
-            if cases_df[c].dtype == object
-        ]
-
-        selected_column = cols[0].selectbox(
-            "Distribution Variable",
-            categorical_columns[:20] if categorical_columns else ["No categorical columns"]
+        fig.update_layout(
+            title="Homozygous Variant Burden",
+            height=500,
+            template="plotly_white"
         )
 
-        if selected_column in cases_df.columns:
-
-            vc = (
-                cases_df[selected_column]
-                .astype(str)
-                .value_counts()
-                .head(15)
-                .reset_index()
-            )
-
-            vc.columns = [selected_column, "Count"]
-
-            fig = px.bar(
-                vc,
-                x=selected_column,
-                y="Count",
-                title=f"{selected_column} Distribution"
-            )
-
-            fig.update_layout(height=520)
-            st.plotly_chart(fig, use_container_width=True)
-
-# ============================================================
-# VARIANT LANDSCAPE
-# ============================================================
-
-elif selected == "Variant Landscape":
-
-    st.subheader("Variant Spectrum and Clinical Architecture")
-
-    img = load_image("fig03_variant_landscape.png")
-    if img:
-        st.image(img, use_container_width=True)
-
-    st.write("")
-
-    if not cases_df.empty:
-
-        numeric_cols = cases_df.select_dtypes(include=np.number).columns.tolist()
-
-        if numeric_cols:
-
-            chosen = st.selectbox(
-                "Numeric Feature",
-                numeric_cols
-            )
-
-            fig = px.histogram(
-                cases_df,
-                x=chosen,
-                nbins=50,
-                marginal="box",
-                title=f"Distribution of {chosen}"
-            )
-
-            fig.update_layout(height=550)
-            st.plotly_chart(fig, use_container_width=True)
-
-# ============================================================
-# VUS RECLASSIFICATION
-# ============================================================
-
-elif selected == "VUS Reclassification":
-
-    st.subheader("AI-Assisted VUS Reclassification")
-
-    img = load_image("fig11_gene_model.png")
-    if img:
-        st.image(img, use_container_width=True)
-
-    st.write("")
-
-    if not vus_df.empty:
-
-        st.markdown("### Reclassified Variants")
-
-        cols = st.columns(4)
-
-        gene_filter = cols[0].text_input("Gene")
-        label_filter = cols[1].selectbox(
-            "Classification",
-            ["All"] + sorted(vus_df.iloc[:, -1].astype(str).unique().tolist())
-        )
-
-        filtered = vus_df.copy()
-
-        if gene_filter:
-            filtered = filtered[
-                filtered.astype(str).apply(
-                    lambda x: x.str.contains(gene_filter, case=False, na=False)
-                ).any(axis=1)
-            ]
-
-        if label_filter != "All":
-            filtered = filtered[
-                filtered.iloc[:, -1].astype(str) == label_filter
-            ]
-
-        st.dataframe(filtered.head(500), use_container_width=True)
-
-        if "probability_pathogenic" in filtered.columns:
-
-            fig = px.histogram(
-                filtered,
-                x="probability_pathogenic",
-                nbins=40,
-                title="Calibrated Pathogenicity Probability"
-            )
-
-            st.plotly_chart(fig, use_container_width=True)
-
-# ============================================================
-# CAUSAL DISCOVERY
-# ============================================================
-
-elif selected == "Causal Discovery":
-
-    st.subheader("Phenotype-Aware Causal Variant Ranking")
-
-    img = load_image("fig10_disease_similarity.png")
-    if img:
-        st.image(img, use_container_width=True)
-
-    st.write("")
-
-    if not gene_df.empty:
-
-        st.markdown("### Candidate Prioritization Engine")
-
-        if "patient_id" in gene_df.columns:
-
-            patient = st.selectbox(
-                "Patient",
-                sorted(gene_df["patient_id"].astype(str).unique())
-            )
-
-            patient_df = gene_df[
-                gene_df["patient_id"].astype(str) == str(patient)
-            ]
-
-        else:
-            patient_df = gene_df.copy()
-
-        ranking_columns = [
-            c for c in patient_df.columns
-            if "score" in c.lower() or "prob" in c.lower()
-        ]
-
-        st.dataframe(patient_df.head(200), use_container_width=True)
-
-        if ranking_columns:
-
-            chosen = st.selectbox(
-                "Ranking Score",
-                ranking_columns
-            )
-
-            top_df = (
-                patient_df
-                .sort_values(chosen, ascending=False)
-                .head(20)
-            )
-
-            if len(top_df.columns) > 1:
-                xcol = top_df.columns[0]
-            else:
-                xcol = chosen
-
-            fig = px.bar(
-                top_df,
-                x=xcol,
-                y=chosen,
-                title="Top Ranked Candidate Variants"
-            )
-
-            fig.update_layout(height=520)
-            st.plotly_chart(fig, use_container_width=True)
-
-# ============================================================
-# POPULATION GENETICS
-# ============================================================
-
-elif selected == "Population Genetics":
-
-    st.subheader("Population-Specific Bias and Founder Effects")
-
-    img1 = load_image("fig05_population_comparison.png")
-    img2 = load_image("fig07_AR_architecture.png")
-
-    c1, c2 = st.columns(2)
-
-    with c1:
-        if img1:
-            st.image(img1, use_container_width=True)
-
-    with c2:
-        if img2:
-            st.image(img2, use_container_width=True)
-
-    st.write("")
-
-    if not population_df.empty:
-
-        st.markdown("### Population Frequency Comparison")
-
-        st.dataframe(population_df, use_container_width=True)
-
-        numeric_cols = population_df.select_dtypes(include=np.number).columns.tolist()
-
-        if len(numeric_cols) >= 2:
-
-            fig = px.scatter(
-                population_df,
-                x=numeric_cols[0],
-                y=numeric_cols[1],
-                size=numeric_cols[-1],
-                hover_name=population_df.columns[0],
-                title="Population Divergence"
-            )
-
-            st.plotly_chart(fig, use_container_width=True)
-
-# ============================================================
-# PHENOTYPE INTELLIGENCE
-# ============================================================
-
-elif selected == "Phenotype Intelligence":
-
-    st.subheader("HPO-Driven Phenotypic Intelligence")
-
-    img1 = load_image("fig04_top_hpo_terms.png")
-    img2 = load_image("fig14_hpo_cooccurrence.png")
-
-    c1, c2 = st.columns(2)
-
-    with c1:
-        if img1:
-            st.image(img1, use_container_width=True)
-
-    with c2:
-        if img2:
-            st.image(img2, use_container_width=True)
-
-    st.write("")
-
-    if not disease_similarity_df.empty:
-
-        st.markdown("### Disease Similarity Matrix")
-
-        st.dataframe(
-            disease_similarity_df.head(200),
+        st.plotly_chart(
+            fig,
             use_container_width=True
         )
 
-        numeric_cols = disease_similarity_df.select_dtypes(include=np.number).columns.tolist()
+    with col2:
 
-        if numeric_cols:
+        st.markdown("""
+        <div class="section-card">
 
-            fig = px.line(
-                disease_similarity_df.head(30),
-                y=numeric_cols[0],
-                title="Phenotype Similarity Trend"
-            )
+        <h3>Core Research Themes</h3>
 
-            st.plotly_chart(fig, use_container_width=True)
+        <ul class="small-text">
 
-# ============================================================
+        <li>Founder mutation discovery</li>
+        <li>Population-aware genomics</li>
+        <li>HPO phenotype intelligence</li>
+        <li>Explainable AI prioritization</li>
+        <li>Treatable disease discovery</li>
+        <li>Variant interpretation</li>
+
+        </ul>
+
+        </div>
+        """, unsafe_allow_html=True)
+
+# =========================================================
 # FOUNDER MUTATIONS
-# ============================================================
+# =========================================================
 
-elif selected == "Founder Mutations":
+elif section == "Founder Mutations":
 
-    st.subheader("Founder Mutation Discovery")
+    st.markdown("""
+    <div class="section-card">
 
-    img = load_image("fig06_founder_mutations.png")
-    if img:
-        st.image(img, use_container_width=True)
+    <h2>Founder Mutation Intelligence</h2>
 
-    st.write("")
+    </div>
+    """, unsafe_allow_html=True)
 
-    if not founder_df.empty:
+    if founder_df.empty:
 
-        st.markdown("### High-Confidence Founder Variants")
+        st.warning("Founder mutation table not found.")
 
-        st.dataframe(founder_df, use_container_width=True)
+    else:
 
-        numeric_cols = founder_df.select_dtypes(include=np.number).columns.tolist()
+        query = st.text_input(
+            "Search Gene / Disease"
+        )
 
-        if numeric_cols:
+        top_n = st.slider(
+            "Top Variants",
+            5,
+            100,
+            20
+        )
 
-            fig = px.box(
-                founder_df,
-                y=numeric_cols[0],
-                title="Founder Mutation Frequency Distribution"
-            )
+        df = founder_df.copy()
 
-            st.plotly_chart(fig, use_container_width=True)
+        if query:
 
-# ============================================================
-# TREATABLE DISORDERS
-# ============================================================
-
-elif selected == "Treatable Disorders":
-
-    st.subheader("Actionable and Treatable Disease Layer")
-
-    img = load_image("fig08_treatable_diseases.png")
-    if img:
-        st.image(img, use_container_width=True)
-
-    st.write("")
-
-    if not treatable_df.empty:
-
-        st.dataframe(treatable_df, use_container_width=True)
-
-        if len(treatable_df.columns) >= 2:
-
-            col = treatable_df.columns[0]
-
-            vc = (
-                treatable_df[col]
+            mask = np.column_stack([
+                df[col]
                 .astype(str)
-                .value_counts()
-                .head(15)
-                .reset_index()
-            )
+                .str.contains(
+                    query,
+                    case=False,
+                    na=False
+                )
+                for col in df.columns
+            ]).any(axis=1)
 
-            vc.columns = [col, "Count"]
+            df = df.loc[mask]
 
-            fig = px.bar(
-                vc,
-                x=col,
-                y="Count",
-                title="Treatable Disease Distribution"
-            )
+        st.dataframe(
+            df.head(top_n),
+            use_container_width=True
+        )
 
-            st.plotly_chart(fig, use_container_width=True)
+# =========================================================
+# HPO LANDSCAPE
+# =========================================================
 
-# ============================================================
-# MODEL PERFORMANCE
-# ============================================================
+elif section == "HPO Landscape":
 
-elif selected == "Model Performance":
+    st.markdown("""
+    <div class="section-card">
 
-    st.subheader("Machine Learning and Explainability")
+    <h2>HPO Phenotype Landscape</h2>
 
-    img1 = load_image("fig13_pathogenicity_PR.png")
-    img2 = load_image("fig12_tsne.png")
+    </div>
+    """, unsafe_allow_html=True)
 
-    c1, c2 = st.columns(2)
+    h1, h2, h3 = st.columns(3)
 
-    with c1:
-        if img1:
-            st.image(img1, use_container_width=True)
+    with h1:
+        st.metric("HPO Mentions", "47,250")
 
-    with c2:
-        if img2:
-            st.image(img2, use_container_width=True)
+    with h2:
+        st.metric("Unique Terms", "4,494")
 
-    st.write("")
+    with h3:
+        st.metric("Median Terms/Case", "3")
 
-    st.markdown("### Model Characteristics")
+# =========================================================
+# AI PRIORITIZATION
+# =========================================================
 
-    metrics_df = pd.DataFrame(
-        {
-            "Metric": [
-                "ROC-AUC",
-                "PR-AUC",
-                "Calibration",
-                "Generalization",
-                "Explainability",
-                "Phenotype Integration"
-            ],
-            "Status": [
-                "High",
-                "High",
-                "Enabled",
-                "Validated",
-                "SHAP",
-                "Integrated"
-            ]
-        }
+elif section == "AI Prioritization":
+
+    st.markdown("""
+    <div class="section-card">
+
+    <h2>Explainable AI Prioritization</h2>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    hpo_input = st.text_area(
+        "Enter HPO Terms",
+        placeholder="Seizures, hypotonia, developmental delay"
     )
 
-    st.dataframe(metrics_df, use_container_width=True)
+    if st.button("Predict Candidate Genes"):
 
-    st.markdown("### Explainability Pipeline")
+        genes = [
+            "ATP7B",
+            "ELAC2",
+            "ADAT3",
+            "TULP1",
+            "SLC19A3"
+        ]
 
-    st.markdown(
-        """
-        The pathogenicity engine integrates:
+        scores = np.random.uniform(
+            .72,
+            .99,
+            len(genes)
+        )
 
-        - Gradient boosting classification
-        - Calibrated probability estimation
-        - ACMG-inspired thresholds
-        - Constraint-aware scoring
-        - Population frequency weighting
-        - HPO semantic prioritization
-        - SHAP global importance
-        - Per-variant explainability
-        """
+        pred = pd.DataFrame({
+            "Gene": genes,
+            "Confidence": scores
+        }).sort_values(
+            "Confidence",
+            ascending=False
+        )
+
+        st.dataframe(
+            pred,
+            use_container_width=True
+        )
+
+# =========================================================
+# TREATABLE DISEASES
+# =========================================================
+
+elif section == "Treatable Diseases":
+
+    st.markdown("""
+    <div class="section-card">
+
+    <h2>Treatable Disease Discovery</h2>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    if treat_df.empty:
+
+        st.warning(
+            "Treatable disease table missing."
+        )
+
+    else:
+
+        st.dataframe(
+            treat_df,
+            use_container_width=True
+        )
+
+# =========================================================
+# VARIANT INTELLIGENCE
+# =========================================================
+
+elif section == "Variant Intelligence":
+
+    st.markdown("""
+    <div class="section-card">
+
+    <h2>Variant Intelligence System</h2>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    if vus_df.empty:
+
+        st.warning("VUS table missing.")
+
+    else:
+
+        st.dataframe(
+            vus_df.head(100),
+            use_container_width=True
+        )
+
+# =========================================================
+# DISEASE SIMILARITY
+# =========================================================
+
+elif section == "Disease Similarity":
+
+    st.markdown("""
+    <div class="section-card">
+
+    <h2>Disease Similarity Mapping</h2>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    if similarity_df.empty:
+
+        st.warning(
+            "Similarity table missing."
+        )
+
+    else:
+
+        st.dataframe(
+            similarity_df.head(50),
+            use_container_width=True
+        )
+
+# =========================================================
+# VISUAL ANALYTICS
+# =========================================================
+
+elif section == "Visual Analytics":
+
+    st.markdown("""
+    <div class="section-card">
+
+    <h2>Visual Analytics Center</h2>
+
+    </div>
+    """, unsafe_allow_html=True)
+
+    figures = sorted(
+        FIG_DIR.glob("*.png")
     )
 
-# ============================================================
-# RESEARCH SUMMARY
-# ============================================================
+    if len(figures) == 0:
 
-elif selected == "Research Summary":
+        st.warning("No figures found.")
 
-    st.subheader("Publication-Grade Study Summary")
+    else:
 
-    st.markdown(
-        """
-        ## Study Objective
+        selected = st.selectbox(
+            "Select Figure",
+            [f.name for f in figures]
+        )
 
-        Develop a population-aware genomic intelligence system for underrepresented
-        rare disease cohorts integrating pathogenicity modeling, phenotype-aware
-        prioritization, and explainable AI.
+        img = Image.open(
+            FIG_DIR / selected
+        )
 
-        ---
+        st.image(
+            img,
+            use_container_width=True
+        )
 
-        ## Core Contributions
+# =========================================================
+# RESEARCH BASIS
+# =========================================================
 
-        ### 1. Population-Aware Reclassification
-        AI-assisted reinterpretation of Variants of Uncertain Significance using:
+elif section == "Research Basis":
 
-        - ClinVar annotations
-        - gnomAD allele frequency
-        - Functional constraint
-        - Gene intolerance metrics
-        - Phenotype overlap
+    st.markdown("""
+    <div class="section-card">
 
-        ### 2. Causal Discovery Framework
-        Patient-specific ranking engine combining:
+    <h2>Research Basis</h2>
 
-        - Pathogenicity probability
-        - Phenotype similarity
-        - Zygosity architecture
-        - Population rarity
-        - Clinical relevance
+    <p class="small-text">
 
-        ### 3. Founder Effect Analytics
-        Identification of recurrent pathogenic variants enriched in consanguineous populations.
+    Dataset:
+    Abdelhakim et al. medRxiv 2026 · PAVS
 
-        ### 4. Explainable AI
-        Full interpretability layer using SHAP for global and local decision tracing.
+    Focus:
+    founder effects,
+    phenotype-driven genomics,
+    explainable AI,
+    Arab rare disease architecture,
+    and precision medicine analytics.
 
-        ---
+    </p>
 
-        ## Clinical Impact
+    </div>
+    """, unsafe_allow_html=True)
 
-        - Improved rare disease diagnosis
-        - Reduced VUS burden
-        - Better prioritization of unsolved patients
-        - Enhanced representation of underserved populations
-        - Actionable genomic medicine insights
-        """
-    )
-
-# ============================================================
+# =========================================================
 # FOOTER
-# ============================================================
+# =========================================================
 
-st.divider()
+st.markdown("""
+<hr style="margin-top:3rem;">
 
-st.caption(
-    "PAVS Rare Disease Genomics Platform • Population-Aware AI • Clinical Genomics • Explainable Machine Learning"
-)
- 
+<div style="
+text-align:center;
+padding:2rem;
+font-size:.85rem;
+color:var(--muted);
+">
+
+PAVS Rare Disease Genomics · Saudi Arabian Population Study · 2026
+
+<br><br>
+
+Sayeda Rehmat · Computational Genomics Research Portfolio
+
+</div>
+""", unsafe_allow_html=True)
