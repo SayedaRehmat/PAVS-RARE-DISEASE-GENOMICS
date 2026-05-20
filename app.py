@@ -10,7 +10,7 @@ import plotly.express as px
 
 st.set_page_config(
     page_title="PAVS Rare Disease Genomics",
-    page_icon="🧬",
+    page_icon="",
     layout="wide"
 )
 
@@ -61,7 +61,7 @@ treat_df = load_csv("data_treatable_cases.csv")
 # SIDEBAR
 # =========================================================
 
-st.sidebar.title("🧬 Navigation")
+st.sidebar.title(" Navigation")
 
 page = st.sidebar.radio(
     "Select Section",
@@ -79,7 +79,7 @@ page = st.sidebar.radio(
 # HEADER
 # =========================================================
 
-st.title("🧬 PAVS Rare Disease Genomics")
+st.title(" PAVS Rare Disease Genomics")
 
 st.markdown(
     """
@@ -153,7 +153,7 @@ if page == "Overview":
 
 elif page == "Founder Mutations":
 
-    st.header("🧬 Founder Mutation Discovery")
+    st.header(" Founder Mutation Discovery")
 
     st.dataframe(founder_df, use_container_width=True)
 
@@ -186,7 +186,7 @@ elif page == "Founder Mutations":
 
 elif page == "Gene Predictions":
 
-    st.header("🧠 Phenotype-Driven Gene Predictions")
+    st.header(" Phenotype-Driven Gene Predictions")
 
     st.dataframe(pred_df, use_container_width=True)
 
@@ -211,7 +211,7 @@ elif page == "Gene Predictions":
 
 elif page == "VUS Reclassification":
 
-    st.header("⚠️ Candidate VUS Reprioritization")
+    st.header(" Candidate VUS Reprioritization")
 
     st.dataframe(vus_df, use_container_width=True)
 
@@ -240,7 +240,7 @@ elif page == "VUS Reclassification":
 
 elif page == "Treatable Diseases":
 
-    st.header("💊 Treatable Rare Diseases")
+    st.header(" Treatable Rare Diseases")
 
     st.dataframe(treat_df, use_container_width=True)
 
@@ -262,7 +262,7 @@ elif page == "Treatable Diseases":
 
 elif page == "Figures":
 
-    st.header("🖼️ Generated Figures")
+    st.header("Generated Figures")
 
     figures = list(FIG_DIR.glob("*.png"))
 
