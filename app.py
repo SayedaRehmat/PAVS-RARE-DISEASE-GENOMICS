@@ -11,7 +11,7 @@ import plotly.graph_objects as go
 
 st.set_page_config(
     page_title="PAVS Rare Disease Genomics",
-    page_icon="🧬",
+    page_icon="",
     layout="wide",
 )
 
@@ -106,7 +106,7 @@ sim_df = load_csv("data_disease_hpo_similarity.csv")
 # SIDEBAR
 # =========================================================
 
-st.sidebar.title("🧬 PAVS Navigation")
+st.sidebar.title(" PAVS Navigation")
 
 page = st.sidebar.radio(
     "Select Section",
@@ -137,7 +137,7 @@ Arab Cohort Genomics
 # TITLE
 # =========================================================
 
-st.title("🧬 PAVS Rare Disease Genomics")
+st.title(" PAVS Rare Disease Genomics")
 
 st.markdown("""
 ### Population-Aware Rare Disease Genomics, Founder Variant Discovery, and Interpretable Phenotype-Driven Gene Prioritization in Arab Cohorts
@@ -151,7 +151,7 @@ st.markdown("---")
 
 if page == "Overview":
 
-    st.header("📊 Cohort Overview")
+    st.header(" Cohort Overview")
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -176,9 +176,6 @@ This framework investigates:
 - Computational VUS prioritization
 - Treatable rare disease identification
 
-The repository integrates phenotype-driven machine learning,
-population genomics, and rare disease analytics using the
-PAVS cohort.
 """)
 
     st.markdown("---")
@@ -198,7 +195,7 @@ PAVS cohort.
 
 elif page == "Population Architecture":
 
-    st.header("🌍 Population Architecture Analysis")
+    st.header(" Population Architecture Analysis")
 
     st.markdown("""
 This section characterizes population-specific inheritance
@@ -245,7 +242,7 @@ patterns and recessive disease architecture across cohorts.
 
 elif page == "Founder Mutations":
 
-    st.header("🧬 Founder Mutation Discovery")
+    st.header(" Founder Mutation Discovery")
 
     st.markdown("""
 The founder analysis framework identifies recurrent variants enriched in Arab populations.
@@ -304,7 +301,7 @@ The founder analysis framework identifies recurrent variants enriched in Arab po
 
 elif page == "Gene Prioritization":
 
-    st.header("🧠 Phenotype-Driven Gene Prioritization")
+    st.header(" Phenotype-Driven Gene Prioritization")
 
     st.markdown("""
 Random Forest phenotype-driven prioritization model trained on solved rare disease cases.
@@ -355,7 +352,7 @@ Random Forest phenotype-driven prioritization model trained on solved rare disea
 
 elif page == "VUS Prioritization":
 
-    st.header("⚠️ Computational Prioritization of Candidate VUS")
+    st.header("Computational Prioritization of Candidate VUS")
 
     st.markdown("""
 Computational framework for prioritizing candidate variants of uncertain significance.
@@ -400,7 +397,7 @@ Computational framework for prioritizing candidate variants of uncertain signifi
 
 elif page == "Treatable Diseases":
 
-    st.header("💊 Treatable Rare Disease Identification")
+    st.header(" Treatable Rare Disease Identification")
 
     st.markdown("""
 Identification of clinically actionable rare disease cases.
@@ -426,7 +423,7 @@ Identification of clinically actionable rare disease cases.
 
     st.plotly_chart(fig, use_container_width=True)
 
-    if not treat_df.empty():
+    if not treat_df.empty:
 
         st.markdown("---")
 
@@ -440,7 +437,7 @@ Identification of clinically actionable rare disease cases.
 
 elif page == "HPO Networks":
 
-    st.header("🧠 HPO Network & Disease Similarity")
+    st.header(" HPO Network & Disease Similarity")
 
     st.markdown("""
 Phenotype similarity structures generated using HPO overlap analysis.
@@ -479,7 +476,7 @@ Phenotype similarity structures generated using HPO overlap analysis.
 
 elif page == "Figures Gallery":
 
-    st.header("🖼️ Publication Figure Gallery")
+    st.header(" Publication Figure Gallery")
 
     figures = list(FIG_DIR.glob("*.png"))
 
