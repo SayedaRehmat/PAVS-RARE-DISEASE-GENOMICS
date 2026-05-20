@@ -122,16 +122,7 @@ page = st.sidebar.radio(
     ]
 )
 
-st.sidebar.markdown("---")
-
-st.sidebar.info("""
-Population-Aware Rare Disease Genomics
-
-Founder Variant Discovery  
-Phenotype-Driven ML  
-HPO Analytics  
-Arab Cohort Genomics
-""")
+ 
 
 # =========================================================
 # TITLE
