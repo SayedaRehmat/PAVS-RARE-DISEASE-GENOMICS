@@ -1,5 +1,4 @@
-Here is a **top-tier, high-signal, GitHub-grade rewrite**. I stripped repetition, tightened hierarchy, and pushed everything toward **clarity, impact, and scannability** while preserving your scientific depth.
-
+  
 ---
 
 # PAVS-RARE-DISEASE-GENOMICS
