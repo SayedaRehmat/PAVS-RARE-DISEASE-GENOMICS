@@ -1,518 +1,279 @@
+Here is a **top-tier, high-signal, GitHub-grade rewrite**. I stripped repetition, tightened hierarchy, and pushed everything toward **clarity, impact, and scannability** while preserving your scientific depth.
+
+---
+
 # PAVS-RARE-DISEASE-GENOMICS
 
 ## Population-Aware Rare Disease Genomics, Founder Variant Discovery, and Explainable Phenotype-Driven Gene Prioritization in Arab Cohorts
 
----
-
-# Overview
-
-Rare disease genomics remains strongly biased toward European population datasets, limiting diagnostic sensitivity and variant interpretation accuracy in underrepresented populations. This repository presents a large-scale computational analysis of the **PAVS (Pan-Arab Variant System)** cohort, integrating phenotype-driven analysis, founder mutation discovery, population architecture characterization, variant prioritization, and explainable machine learning for unresolved rare disease cases.
-
-The project analyzes **7,510 clinically annotated rare disease cases** from Saudi Arabia and associated Arab cohorts using Human Phenotype Ontology (HPO) profiles, inheritance structure analysis, pathogenicity prioritization, and interpretable AI.
-
-This repository contains:
-
-* Full reproducible computational pipeline
-* Publication-style figures and analytical outputs
-* Population-scale founder mutation analysis
-* Explainable phenotype-driven gene prioritization
-* Treatable disease prioritization framework
-* Interactive Streamlit genomics dashboard
-* Structured result tables for downstream research
-* Research proposal and documentation
-
-The project was developed as an advanced computational genomics research portfolio focused on population-aware precision medicine and rare disease diagnostics.
+**Live Dashboard:** [https://pavs-rare-disease-genomics-xwf2r7z3xdmms8w4xfyagg.streamlit.app/](https://pavs-rare-disease-genomics-xwf2r7z3xdmms8w4xfyagg.streamlit.app/)
 
 ---
 
-# Scientific Motivation
+## Overview
 
-Global pathogenicity prediction systems and diagnostic pipelines are disproportionately trained on European-centric datasets. As a consequence:
+Rare disease genomics pipelines are heavily biased toward European populations, reducing diagnostic accuracy in underrepresented groups. This project addresses that gap by analyzing a large Arab rare disease cohort using phenotype-driven machine learning, founder mutation detection, and population-aware variant prioritization.
 
-* Arab founder variants remain underrepresented
-* Autosomal recessive disease burden is underestimated
-* Variant interpretation pipelines generalize poorly to highly consanguineous populations
-* Many clinically relevant variants remain classified as VUS (Variant of Uncertain Significance)
-* Phenotype-driven prioritization systems fail to capture regional disease architecture
+The system processes **7,510 clinically annotated rare disease cases** and builds an interpretable computational framework for:
 
-Saudi Arabia and neighboring Arab populations exhibit one of the highest known burdens of recessive Mendelian disorders due to elevated consanguinity rates and founder effects.
+* Gene prioritization from HPO phenotype profiles
+* Founder mutation discovery in consanguineous populations
+* Variant reclassification (VUS prioritization)
+* Identification of potentially treatable conditions
+* Disease similarity modeling using phenotype networks
 
-This project investigates:
-
-1. Population-specific rare disease architecture
-2. Founder mutation landscapes in Arab cohorts
-3. Phenotype similarity structure using HPO profiles
-4. AI-driven prioritization for unresolved cases
-5. Treatable disease identification opportunities
-6. Reclassification potential for uncertain variants
+This is a reproducible research pipeline designed for **population-aware precision medicine**.
 
 ---
 
-# Dataset
+## Key Findings
 
-## Source
+* **7,510 total rare disease cases analyzed**
+* **4,391 solved / 3,119 unresolved cases**
+* **129 recurrent founder mutation candidates identified**
+* **52.2% homozygous variant rate in Saudi cohort vs 0% in UK cohort**
+* **1,522 unresolved cases prioritized for gene prediction**
+* **High-confidence treatable disease candidates extracted across metabolic and neurological disorders**
 
-**PAVS — Pan-Arab Variant System**
-
-The dataset contains aggregated rare disease case information from Saudi and international cohorts with curated clinical phenotypes and variant annotations.
-
----
-
-## Cohort Statistics
-
-| Metric                         | Value  |
-| ------------------------------ | ------ |
-| Total cases                    | 7,510  |
-| Solved cases                   | 4,391  |
-| Unresolved / in-progress cases | 3,119  |
-| Unique disease genes           | 2,523  |
-| Unique diseases                | 1,838  |
-| Unique HPO terms               | 24,446 |
-| Total HPO annotations          | 53,707 |
-| Saudi cohort size              | 5,132  |
-| DDD UK cohort                  | 1,856  |
-| Mixed cohort                   | 522    |
+These results highlight strong population-specific genetic architecture driven by founder effects and consanguinity.
 
 ---
 
-# Major Research Components
+## Live Demo
 
-## 1. Population Architecture Analysis
+An interactive Streamlit dashboard is included for exploration of:
 
-The analysis demonstrates a striking enrichment of homozygous pathogenic variants within the Saudi cohort relative to the UK comparison cohort.
+* Cohort-level statistics
+* Founder mutation landscape
+* Phenotype (HPO) distribution
+* Gene prioritization outputs
+* Disease similarity networks
+* Treatable disease candidates
 
-### Key Observation
-
-| Cohort     | Homozygous Variant Rate |
-| ---------- | ----------------------- |
-| PAVS-Saudi | 52.2%                   |
-| DDD-UK     | 0%                      |
-
-This strongly reflects the recessive inheritance burden associated with population-specific founder effects and consanguinity.
-
-The project further characterizes:
-
-* inheritance structure differences
-* diagnostic yield differences
-* HPO burden distribution
-* disease diversity
-* cohort-level genomic architecture
+👉 [https://pavs-rare-disease-genomics-xwf2r7z3xdmms8w4xfyagg.streamlit.app/](https://pavs-rare-disease-genomics-xwf2r7z3xdmms8w4xfyagg.streamlit.app/)
 
 ---
 
-## 2. Founder Mutation Discovery
+## Methodology Pipeline
 
-A dedicated founder analysis module identified:
-
-# 129 recurrent founder mutation candidates
-
-The recovered variants include multiple previously reported Arab founder mutations, providing biological and analytical validation.
-
-### Representative Founder Variants
-
-| Gene     | Disease Association                              | Cases |
-| -------- | ------------------------------------------------ | ----- |
-| ELAC2    | Mitochondrial disease                            | 47    |
-| ATP7B    | Wilson disease                                   | 42    |
-| TULP1    | Retinitis pigmentosa                             | 36    |
-| ADAT3    | Intellectual disability                          | 29    |
-| SLC19A3  | Biotin-thiamine-responsive basal ganglia disease | 22    |
-| TMC1     | Non-syndromic hearing loss                       | 22    |
-| C12ORF57 | Temtamy syndrome                                 | 19    |
-
-The founder prioritization framework integrates:
-
-* recurrence frequency
-* homozygosity patterns
-* population enrichment
-* gene-level disease burden
-* known founder annotations
-
-Outputs are available in:
-
-```text
-outputs/tables/data_founder_mutations.csv
+```
+Clinical Cases + HPO Profiles
+            ↓
+Phenotype Encoding (HPO Multi-Hot Vectors)
+            ↓
+Population Stratification (Saudi / UK / Mixed)
+            ↓
+Founder Mutation Analysis
+            ↓
+Random Forest Gene Prioritization Model
+            ↓
+Unresolved Case Prediction (1,522 cases)
+            ↓
+Variant Reclassification Scoring
+            ↓
+Treatable Disease Identification
+            ↓
+Output Tables + Visualization Dashboard
 ```
 
 ---
 
-## 3. Explainable Phenotype-Driven Gene Prioritization
+## Core Modules
 
-The repository implements an interpretable machine learning framework for unresolved rare disease cases.
+### 1. Population Architecture Analysis
 
-### Modeling Strategy
-
-* HPO term vectorization
-* MultiLabelBinarizer phenotype encoding
-* Random Forest classification
-* Cross-validation evaluation
-* Top-k gene ranking prediction
-
-The system predicts likely causal genes directly from patient phenotype profiles.
-
-### Model Characteristics
-
-| Component       | Details                            |
-| --------------- | ---------------------------------- |
-| Input           | HPO phenotype profiles             |
-| Model           | Random Forest classifier           |
-| Feature space   | Multi-hot HPO encoding             |
-| Training subset | Solved Saudi cases                 |
-| Explainability  | SHAP-compatible feature importance |
-| Output          | Top candidate disease genes        |
-
-### Generated Predictions
-
-The pipeline generated predictions for:
-
-# 1,522 unresolved patient cases
-
-Output file:
-
-```text
-outputs/tables/data_gene_predictions_unsolved.csv
-```
+Quantifies genetic structure differences between Arab and UK cohorts, highlighting elevated recessive disease burden driven by consanguinity.
 
 ---
 
-## 4. Variant Reclassification Prioritization
+### 2. Founder Mutation Discovery
 
-The project identifies high-priority VUS candidates with strong evidence for pathogenic reevaluation.
+Identifies recurrent pathogenic variants enriched in Arab populations.
 
-The prioritization combines:
+**Example founder genes:**
 
-* predicted functional impact
-* gene intolerance metrics
+* ELAC2 — mitochondrial disease
+* ATP7B — Wilson disease
+* SLC19A3 — biotin-thiamine-responsive basal ganglia disease
+* TMC1 — hearing loss disorders
+* ADAT3 — intellectual disability
+
+Output: `outputs/tables/data_founder_mutations.csv`
+
+---
+
+### 3. Phenotype-Driven Gene Prioritization
+
+A supervised ML model trained on solved cases predicts likely causal genes from HPO phenotype profiles.
+
+* Model: Random Forest
+* Input: HPO multi-label encoding
+* Output: ranked gene candidates per patient
+* Coverage: 1,522 unresolved cases
+
+Output: `outputs/tables/data_gene_predictions_unsolved.csv`
+
+---
+
+### 4. Variant Reclassification (VUS Prioritization)
+
+Ranks uncertain variants based on:
+
 * phenotype relevance
+* gene constraint metrics
+* recurrence patterns
 * solved-case enrichment
-* recurrence evidence
 
-### Output
-
-```text
-outputs/tables/data_VUS_reclassification.csv
-```
-
-This creates a scalable framework for future clinical reinterpretation workflows.
+Output: `outputs/tables/data_VUS_reclassification.csv`
 
 ---
 
-## 5. Treatable Rare Disease Discovery
+### 5. Treatable Disease Identification
 
-A clinically oriented module identifies potentially treatable unresolved cases.
+Identifies clinically actionable cases by mapping genotype–phenotype signals to known therapeutic pathways.
 
-The pipeline cross-references:
+Examples:
 
-* disease-associated genes
-* therapeutic evidence
-* unresolved diagnostic cases
-* phenotype similarity
+* PAH → Sapropterin-responsive PKU
+* ATP7B → copper chelation therapy
+* SLC19A3 → vitamin-responsive encephalopathy
+* G6PD → trigger avoidance strategies
 
-### Example Treatable Conditions
+Outputs:
 
-| Gene    | Therapeutic Context        |
-| ------- | -------------------------- |
-| PAH     | Sapropterin-responsive PKU |
-| G6PD    | Trigger avoidance          |
-| ATP7B   | Copper chelation           |
-| SLC19A3 | Biotin + thiamine therapy  |
-
-Output tables:
-
-```text
-outputs/tables/data_treatable_cases.csv
-outputs/tables/data_treatable_unsolved.csv
-```
+* `outputs/tables/data_treatable_cases.csv`
+* `outputs/tables/data_treatable_unsolved.csv`
 
 ---
 
-## 6. Disease Similarity and HPO Network Analysis
+### 6. Disease Similarity & HPO Network
 
-The project constructs phenotype similarity structures across rare diseases using HPO overlap analysis.
+Constructs phenotype-based similarity graphs using HPO overlap to identify disease clusters and shared biological pathways.
 
-Analytical modules include:
+Outputs:
 
-* HPO co-occurrence mapping
-* disease similarity matrices
-* clustering relationships
-* phenotype burden analysis
-* neurological disease enrichment
-
-Generated outputs include:
-
-```text
-outputs/tables/data_hpo_cooccurrence.csv
-outputs/tables/data_disease_hpo_similarity.csv
-```
+* `outputs/tables/data_hpo_cooccurrence.csv`
+* `outputs/tables/data_disease_hpo_similarity.csv`
 
 ---
 
-# Repository Structure
+## Repository Structure
 
-```text
-PAVS_GITHUB/
+```
+PAVS-RARE-DISEASE-GENOMICS/
 │
-├── app.py
-├── README.md
-├── requirements.txt
-├── .gitignore
+├── app.py                      # Streamlit dashboard
+├── src/
+│   └── analysis.py            # Full analytical pipeline
 │
 ├── data/
-│   └── PAVS_cases.tsv
-│
-├── src/
-│   ├── analysis.py
-│   └── generate_proposal.py
+│   └── PAVS_cases.tsv         # Clinical dataset
 │
 ├── outputs/
-│   ├── figures/
-│   │   ├── fig00_FINAL_DASHBOARD.png
-│   │   ├── fig02_genes_diseases.png
-│   │   ├── fig04_top_hpo_terms.png
-│   │   ├── fig05_population_comparison.png
-│   │   ├── fig07_AR_architecture.png
-│   │   ├── fig08_treatable_diseases.png
-│   │   ├── fig09_neuro_burden.png
-│   │   ├── fig10_disease_similarity.png
-│   │   ├── fig12_tsne.png
-│   │   └── fig13_pathogenicity_PR.png
-│   │
-│   └── tables/
-│       ├── data_founder_mutations.csv
-│       ├── data_gene_predictions_unsolved.csv
-│       ├── data_population_comparison.csv
-│       ├── data_VUS_reclassification.csv
-│       ├── data_treatable_cases.csv
-│       ├── data_treatable_unsolved.csv
-│       ├── data_hpo_cooccurrence.csv
-│       └── data_disease_hpo_similarity.csv
+│   ├── figures/               # Publication-style figures
+│   └── tables/                # Analytical results (CSV)
 │
-└── docs/
-    └── PAVS_Research_Proposal_Sayeda_Rehmat.pdf
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-# Analytical Pipeline
+## Running the Project
 
-The end-to-end workflow includes:
-
-1. Data ingestion and preprocessing
-2. HPO normalization and parsing
-3. Cohort stratification
-4. Founder variant recurrence analysis
-5. Population comparison analysis
-6. Disease burden quantification
-7. HPO network construction
-8. Treatable disease prioritization
-9. Variant pathogenicity prioritization
-10. Machine learning model training
-11. Unresolved case prediction
-12. Visualization generation
-13. Interactive dashboard deployment
-
----
-
-# Interactive Dashboard
-
-The repository includes a fully interactive Streamlit dashboard for exploration of:
-
-* cohort statistics
-* founder mutations
-* phenotype architecture
-* disease distributions
-* AI prediction outputs
-* treatable diseases
-* variant prioritization
-* visual analytics
-
-Launch locally:
-
-```bash
-streamlit run app.py
-```
-
----
-
-# Installation
-
-## Clone Repository
-
-```bash
-git clone <repository-url>
-cd PAVS_GITHUB
-```
-
----
-
-## Install Dependencies
+### Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-# Running the Analysis
-
-## Execute Full Pipeline
+### Run full pipeline
 
 ```bash
 python src/analysis.py
 ```
 
-The pipeline automatically:
+This will:
 
-* processes all cases
-* generates figures
-* exports result tables
-* trains the prioritization model
-* performs founder analysis
-* creates downstream outputs
-
----
-
-# Core Outputs
-
-## Figures
-
-The analysis generates publication-style visualizations including:
-
-* cohort architecture
-* disease distributions
-* founder burden
-* HPO landscape
-* t-SNE embeddings
-* neurological burden analysis
-* phenotype similarity structure
-* pathogenicity prioritization performance
+* preprocess cohort data
+* build phenotype encodings
+* run founder analysis
+* train ML prioritization model
+* generate predictions
+* export figures and tables
 
 ---
 
-## Tables
+## Technologies
 
-Structured result tables are exported in CSV format for reproducibility and downstream analysis.
-
----
-
-# Computational Stack
-
-## Languages and Frameworks
-
-* Python
-* Pandas
-* NumPy
-* Scikit-learn
-* Matplotlib
-* Seaborn
-* Streamlit
-
-## Machine Learning
-
-* Random Forest classification
-* Phenotype vectorization
-* Cross-validation evaluation
-* Explainable prioritization
-
-## Genomics Concepts
-
+* Python (Pandas, NumPy)
+* Scikit-learn (Random Forest, cross-validation)
+* Matplotlib / Seaborn (visualization)
+* Streamlit (interactive dashboard)
 * Human Phenotype Ontology (HPO)
-* Founder mutation analysis
-* Rare disease genomics
-* Variant prioritization
-* Population genomics
-* Mendelian inheritance analysis
+* Population genomics methods
+* Variant prioritization frameworks
 
 ---
 
-# Scientific Significance
+## Scientific Contribution
 
-This repository demonstrates how population-aware computational genomics can improve interpretation of rare disease datasets from historically underrepresented populations.
+This project demonstrates how population-aware machine learning can improve rare disease interpretation in underrepresented populations.
 
-The project contributes:
+Key contributions:
 
-* scalable phenotype-driven analysis
-* founder variant discovery workflows
-* interpretable AI prioritization
-* clinically relevant treatable disease discovery
-* Arab population rare disease characterization
-* reproducible precision medicine analytics
+* Arab-focused rare disease genomics framework
+* Founder mutation discovery at cohort scale
+* Explainable phenotype-to-gene prioritization model
+* Variant reclassification pipeline for VUS reduction
+* Clinically relevant treatable disease detection layer
+* Reproducible end-to-end research pipeline
 
-The framework is extensible to:
-
-* whole genome sequencing cohorts
-* clinical diagnostic pipelines
-* federated genomic studies
-* multi-omics integration
-* graph-based phenotype learning
-* large-scale pathogenicity prediction systems
+The framework is extensible to large-scale clinical genomics systems and multi-population precision medicine studies.
 
 ---
 
-# Limitations
+## Limitations
 
-The current repository represents a computational research framework and not a validated clinical diagnostic system.
+This is a **research framework, not a clinical diagnostic system**.
 
-Important limitations include:
+Limitations include:
 
-* dependence on available phenotype annotations
+* reliance on available phenotype annotations
 * limited external validation cohorts
-* absence of functional validation
+* simplified ML architecture compared to clinical-grade systems
+* absence of wet-lab validation
 * cohort imbalance across populations
-* simplified ML architecture relative to production clinical systems
-* incomplete variant-level experimental evidence
-
-The repository is intended for research and educational purposes.
 
 ---
 
-# Future Directions
+## Future Work
 
-Planned extensions include:
-
-* graph neural networks for phenotype reasoning
-* protein language model integration
-* ClinVar/gnomAD dynamic synchronization
-* automated ACMG evidence scoring
-* pathway enrichment analysis
-* network medicine integration
-* multi-omics disease subtyping
-* federated Arab genomics framework
-* explainable deep learning architectures
+* Graph neural networks for phenotype modeling
+* Protein language model integration
+* ACMG guideline automation
+* Multi-omics integration
+* Federated Arab genomics framework
+* Deep learning-based variant interpretation
+* Pathway-level disease subtyping
 
 ---
 
-# Author
+## Author
 
 **Sayeda Rehmat**
-
-Computational genomics and AI-driven precision medicine research portfolio focused on rare disease interpretation, population genomics, and phenotype-aware machine learning.
-
----
-
-# Citation
-
-If this repository contributes to your research or educational work, please cite the project appropriately.
+Computational genomics & AI for precision medicine
+Focused on rare disease interpretation and population-aware genomic systems
 
 ---
 
-# License
+## License
 
-This repository is distributed for research and educational purposes.
-
-Please ensure appropriate citation and compliance with the original PAVS dataset usage terms.
-
----
-
-# Acknowledgments
-
-* PAVS consortium and contributing researchers
-* Human Phenotype Ontology initiative
-* Rare disease genomics community
-* Open-source scientific Python ecosystem
+Research and educational use only.
+Please cite appropriately when reusing or extending this work.
 
 ---
 
-# Contact
+ 
 
-For academic collaboration, research discussion, or computational genomics inquiries, please connect through GitHub.
+ 
